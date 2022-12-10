@@ -16,5 +16,4 @@ public class Register {
     private String designation;
     private String description;
     private String url;
-    private Boolean approvalRate;
 }
