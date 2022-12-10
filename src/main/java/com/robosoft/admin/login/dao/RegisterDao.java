@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 public class RegisterDao {
 
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbcTemplate;
+
+
     public void adminRegister(Register register, String url) {
         jdbcTemplate.update("INSERT INTO admin(emailId,profilePhoto,fullName,mobileNumber,designation,description,url,approvalStatus) VALUES(?,?,?,?,?,?,?,?)",register.getEmailId(),url,
                 register.getFullName(),register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),false);
@@ -22,4 +24,5 @@ public class RegisterDao {
     public void resetPassword(String emailId, String password) {
         jdbcTemplate.update("UPDATE authenticate SET password = ? WHERE emailId = ?",password,emailId);
     }
+
 }

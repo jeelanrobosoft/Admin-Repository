@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class RegisterService {
 
     @Autowired
-    RegisterDao registerDao;
+    private RegisterDao registerDao;
 
 
     public String uploadProfilePhoto(MultipartFile profilePhoto)

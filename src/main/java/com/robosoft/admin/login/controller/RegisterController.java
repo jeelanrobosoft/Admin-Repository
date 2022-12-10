@@ -1,6 +1,7 @@
 package com.robosoft.admin.login.controller;
 
 import com.robosoft.admin.login.model.Register;
+
 import com.robosoft.admin.login.model.ResetPassword;
 import com.robosoft.admin.login.service.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,6 @@ public class RegisterController {
         if(s != null)
             return new ResponseEntity<>(Collections.singletonMap("message",s), HttpStatus.OK);
         return new ResponseEntity<>(Collections.singletonMap("message","Something Went Wrong"),HttpStatus.BAD_REQUEST);
+
     }
 }

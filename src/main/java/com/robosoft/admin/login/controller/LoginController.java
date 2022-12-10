@@ -112,11 +112,16 @@ public class LoginController {
 //        return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
 //    }
 
-//    @PostMapping("/resend")
-//    public ResponseEntity<?> resendOtp(@RequestBody EmailId emailId){
-//
-//
-//    }
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendOtp(@RequestBody EmailId emailId){
+        String status = loginService.checkForEmail(emailId);
+        if (status != null)
+            return new ResponseEntity<>(Collections.singletonMap("message", status), HttpStatus.NOT_FOUND);
+        loginService.deletePreviousOtp(emailId);
+        Long otpStatus = loginService.sendOtp(emailId);
+        otpSendEmailId = emailId.getEmailId();
+        return new ResponseEntity<>(Collections.singletonMap("message", "OTP Valid for " + otpStatus + " Mins"), HttpStatus.OK);
+    }
 
 
     @Scheduled(fixedRate = 300000)
