@@ -14,4 +14,12 @@ public class RegisterDao {
         jdbcTemplate.update("INSERT INTO admin(emailId,profilePhoto,fullName,mobileNumber,designation,description,url,approvalStatus) VALUES(?,?,?,?,?,?,?,?)",register.getEmailId(),url,
                 register.getFullName(),register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),false);
     }
+
+    public String getAdminEmailId(String emailId) {
+        return jdbcTemplate.queryForObject("SELECT emailId FROM admin WHERE emailId = ?", String.class,emailId);
+    }
+
+    public void resetPassword(String emailId, String password) {
+        jdbcTemplate.update("UPDATE authenticate SET password = ? WHERE emailId = ?",password,emailId);
+    }
 }
