@@ -38,7 +38,6 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers(BASE_URL).permitAll()
-                .antMatchers("/admin/register").hasRole("SUPER_ADMIN")
                 .antMatchers("/admin/***").hasAnyRole("ADMIN","SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
