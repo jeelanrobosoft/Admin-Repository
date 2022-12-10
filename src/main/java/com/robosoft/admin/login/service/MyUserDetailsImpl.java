@@ -32,7 +32,7 @@ public class MyUserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return userAuth.getUserName();
+        return userAuth.getEmailId();
     }
 
     @Override

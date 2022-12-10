@@ -32,6 +32,7 @@ public class LoginDataAccessLayer {
         return ((Long.parseLong(expiryTime)) / 60) - ((Long.parseLong(generatedTime)) / 60);
     }
 
+
     public String fetchOtpForGivenEmail(OtpVerification verification) {
         String query = "select otp,expiryTime from otpVerification where emailId='" + verification.getEmailId() + "' and status=true";
         OtpValidity otpVerification = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(OtpValidity.class));
@@ -42,4 +43,5 @@ public class LoginDataAccessLayer {
         return "Verification Fail";
 
     }
+
 }
