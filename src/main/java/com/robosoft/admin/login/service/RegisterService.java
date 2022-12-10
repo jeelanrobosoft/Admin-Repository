@@ -52,17 +52,16 @@ public class RegisterService {
         String regex = "^(.+)@(.+)$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(register.getEmailId());
+        String url = null;
         if(!matcher.matches())
         {
             return "Invalid EmailId";
         }
-        if(register.getProfilePhoto() != null)
+        if(!register.getProfilePhoto().isEmpty())
         {
-           uploadProfilePhoto(register.getProfilePhoto());
-
-
+           url = uploadProfilePhoto(register.getProfilePhoto());
         }
-        Pattern ptrn = Pattern.compile("(0/91)?[6-9][0-9]{9}");
+        Pattern ptrn = Pattern.compile("\\d{10}");
 
         Matcher phMatcher = ptrn.matcher(register.getMobileNumber());
         if(!phMatcher.matches())
@@ -70,7 +69,7 @@ public class RegisterService {
             return "Invalid Mobile Number";
         }
         try {
-            registerDao.adminRegister(register);
+            registerDao.adminRegister(register,url);
             return "Registration Request Sent You Will Receive the Mail ASAP.";
         }
         catch (Exception e)
