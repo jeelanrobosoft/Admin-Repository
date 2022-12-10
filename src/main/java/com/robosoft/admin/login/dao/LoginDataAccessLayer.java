@@ -32,14 +32,14 @@ public class LoginDataAccessLayer {
         return ((Long.parseLong(expiryTime)) / 60) - ((Long.parseLong(generatedTime)) / 60);
     }
 
-    public String fetchOtpForGivenEmail(OtpVerification verification) {
-        String query = "select otp,expiryTime from otpVerification where mobileNumber='" + verification.getEmailId() + "' and status=true";
-        OtpValidity otpVerification = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(OtpValidity.class));
-        if (otpVerification.getOtp().equals(verification.getOtp()) && ((System.currentTimeMillis() / 1000) <= Long.parseLong(otpVerification.getExpiryTime()))) {
-            jdbcTemplate.update("update otpVerification set status=false where mobileNumber='" + verification.getEmailId() + "' and status=true");
-            return "Verified";
-        }
-        return "Verification Fail";
-
-    }
+//    public String fetchOtpForGivenEmail(OtpVerification verification) {
+//        String query = "select otp,expiryTime from otpVerification where mobileNumber='" + verification.getEmailId() + "' and status=true";
+//        OtpValidity otpVerification = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(OtpValidity.class));
+//        if (otpVerification.getOtp().equals(verification.getOtp()) && ((System.currentTimeMillis() / 1000) <= Long.parseLong(otpVerification.getExpiryTime()))) {
+//            jdbcTemplate.update("update otpVerification set status=false where mobileNumber='" + verification.getEmailId() + "' and status=true");
+//            return "Verified";
+//        }
+//        return "Verification Fail";
+//
+//    }
 }

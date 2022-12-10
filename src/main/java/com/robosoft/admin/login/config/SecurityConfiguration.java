@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 
-    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/reSend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register"};
+    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/reSend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register","/admin/refreshToken"};
 
 
 
@@ -38,7 +38,6 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers(BASE_URL).permitAll()
-                .antMatchers("/admin/register").hasRole("SUPER_ADMIN")
                 .antMatchers("/admin/***").hasAnyRole("ADMIN","SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
