@@ -27,7 +27,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 
-    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/reSend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register","/admin/refreshToken"};
+    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/reSend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register","/admin/refreshToken","admin/resetPassword"};
 
 
 

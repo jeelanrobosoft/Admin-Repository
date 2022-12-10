@@ -4,7 +4,9 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.robosoft.admin.login.dao.RegisterDao;
 import com.robosoft.admin.login.model.Register;
+import com.robosoft.admin.login.model.ResetPassword;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,6 +78,19 @@ public class RegisterService {
         {
             e.printStackTrace();
             return "Registration Failed";
+        }
+    }
+
+    public String resetPassword(ResetPassword resetPassword) {
+        try {
+            String emailId = registerDao.getAdminEmailId(resetPassword.getEmailId());
+            if(emailId != null)
+                registerDao.resetPassword(emailId,new BCryptPasswordEncoder().encode(resetPassword.getPassword()));
+            return "Password Updated Successfully.";
+        }
+        catch (Exception exception)
+        {
+            return "Invalid Email Id";
         }
     }
 }
