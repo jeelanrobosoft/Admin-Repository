@@ -102,15 +102,15 @@ public class LoginController {
         }
     }
 
-//    @PostMapping("/verify")
-//    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerification verification) {
-//        if (!verification.getEmailId().equalsIgnoreCase(otpSendEmailId))
-//            return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
-//        String verificationStatus = loginService.verifyOtp(verification);
-//        if (verificationStatus.equals("Verified"))
-//            return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.OK);
-//        return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
-//    }
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerification verification) {
+        if (!verification.getEmailId().equalsIgnoreCase(otpSendEmailId))
+            return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
+        String verificationStatus = loginService.verifyOtp(verification);
+        if (verificationStatus.equals("Verified"))
+            return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
+    }
 
     @PostMapping("/resend")
     public ResponseEntity<?> resendOtp(@RequestBody EmailId emailId){
