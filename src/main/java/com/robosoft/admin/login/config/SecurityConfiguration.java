@@ -28,7 +28,7 @@ public class SecurityConfiguration {
 
 
     private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/reSend"
-            ,"/admin/verify","/admin/login","/admin/dummy"};
+            ,"/admin/verify","/admin/login","/admin/dummy","/admin/refreshToken"};
 
 
     @Bean
