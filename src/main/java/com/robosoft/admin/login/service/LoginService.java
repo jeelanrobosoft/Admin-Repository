@@ -45,7 +45,7 @@ public class LoginService {
         return dataAccessLayer.saveOtp(generatedTime,expiryTime,twoFaCode,emailId.getEmailId());
     }
 
-    public String verifyOtp(OtpVerification verification) {
-        return dataAccessLayer.fetchOtpForGivenEmail(verification);
-    }
+//    public String verifyOtp(OtpVerification verification) {
+//        return dataAccessLayer.fetchOtpForGivenEmail(verification);
+//    }
 }
