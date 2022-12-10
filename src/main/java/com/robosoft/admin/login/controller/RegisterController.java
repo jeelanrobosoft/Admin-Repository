@@ -16,7 +16,7 @@ import java.util.Collections;
 public class RegisterController {
 
     @Autowired
-    private RegisterService registerService;
+    RegisterService registerService;
 
     @PostMapping("/register")
     public ResponseEntity<?> adminRegister(@ModelAttribute Register register){
@@ -26,7 +26,7 @@ public class RegisterController {
         return new ResponseEntity<>(Collections.singletonMap("message","Something Went Wrong"),HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/register")
+    @PutMapping("/resetPassword")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPassword resetPassword){
         String s = registerService.resetPassword(resetPassword);
         if(s != null)
