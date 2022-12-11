@@ -48,4 +48,5 @@ public class LoginService {
     public String verifyOtp(OtpVerification verification) {
         return dataAccessLayer.fetchOtpForGivenEmail(verification);
     }
+
 }
