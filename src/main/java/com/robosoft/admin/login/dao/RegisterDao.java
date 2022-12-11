@@ -18,11 +18,11 @@ public class RegisterDao {
     }
 
     public String getAdminEmailId(String emailId) {
-        return jdbcTemplate.queryForObject("SELECT emailId FROM admin WHERE emailId = ?", String.class,emailId);
+        return jdbcTemplate.queryForObject("select emailId from admin where emailId=?", String.class,emailId);
     }
 
     public void resetPassword(String emailId, String password) {
-        jdbcTemplate.update("UPDATE authenticate SET password = ? WHERE emailId = ?",password,emailId);
+        jdbcTemplate.update("UPDATE authenticate SET password=? WHERE userName=?",password,emailId);
     }
 
 }

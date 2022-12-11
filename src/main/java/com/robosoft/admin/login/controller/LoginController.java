@@ -5,6 +5,7 @@ import com.robosoft.admin.login.dto.JwtResponse;
 import com.robosoft.admin.login.model.*;
 import com.robosoft.admin.login.service.LoginService;
 import com.robosoft.admin.login.service.MyUserDetailsService;
+import com.robosoft.admin.login.service.RegisterService;
 import com.robosoft.admin.login.utility.JwtUtility;
 import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,10 +46,14 @@ public class LoginController {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    RegisterService registerService;
+
     private String otpSendEmailId;
 
 
-    @PostMapping("/login")
+
+    @PutMapping("/login")
     public ResponseEntity<?> login(@RequestBody Authenticate adminAuth) throws Exception {
         try {
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(adminAuth.getUserName(), adminAuth.getPassword()));
@@ -82,12 +88,22 @@ public class LoginController {
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpVerification verification) {
-        if (!verification.getEmailId().equalsIgnoreCase(otpSendEmailId))
+        if (!(verification.getEmailId().equalsIgnoreCase(otpSendEmailId)))
             return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
         String verificationStatus = loginService.verifyOtp(verification);
         if (verificationStatus.equals("Verified"))
             return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.OK);
         return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @GetMapping("/refreshToken")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) throws Exception {
+        DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
+        Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
+        if(expectedMap == null)
+            return new ResponseEntity<>(Collections.singletonMap("Error" , "Token Not Expired"), HttpStatus.NOT_ACCEPTABLE);
+        String token = jwtUtility.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
+        return new ResponseEntity<>(new JwtResponse(token),HttpStatus.OK);
     }
 
     public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
@@ -113,6 +129,18 @@ public class LoginController {
         otpSendEmailId = emailId.getEmailId();
         return new ResponseEntity<>(Collections.singletonMap("message", "OTP Valid for " + otpStatus + " Mins"), HttpStatus.OK);
     }
+
+    @PutMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPassword resetPassword){
+        if (!(resetPassword.getEmailId().equalsIgnoreCase(otpSendEmailId)))
+            return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
+        String s = registerService.resetPassword(resetPassword);
+        if(s != null)
+            return new ResponseEntity<>(Collections.singletonMap("message",s), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("message","Something Went Wrong"),HttpStatus.BAD_REQUEST);
+
+    }
+
 
 
     @Scheduled(fixedRate = 300000)

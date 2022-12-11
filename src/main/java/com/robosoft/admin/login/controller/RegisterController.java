@@ -27,12 +27,5 @@ public class RegisterController {
         return new ResponseEntity<>(Collections.singletonMap("message","Something Went Wrong"),HttpStatus.BAD_REQUEST);
     }
 
-    @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPassword resetPassword){
-        String s = registerService.resetPassword(resetPassword);
-        if(s != null)
-            return new ResponseEntity<>(Collections.singletonMap("message",s), HttpStatus.OK);
-        return new ResponseEntity<>(Collections.singletonMap("message","Something Went Wrong"),HttpStatus.BAD_REQUEST);
 
-    }
 }
