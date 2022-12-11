@@ -22,7 +22,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,15 +80,16 @@ public class LoginController {
         return new ResponseEntity<>(Collections.singletonMap("message", "OTP Valid for " + otpStatus + " Mins"), HttpStatus.OK);
     }
 
-    @GetMapping("/refreshToken")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) throws Exception {
-        DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
-        Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
-        if(expectedMap == null)
-            return new ResponseEntity<>(Collections.singletonMap("Error" , "Token Not Expired"), HttpStatus.NOT_ACCEPTABLE);
-        String token = jwtUtility.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
-        return new ResponseEntity<>(new JwtResponse(token),HttpStatus.OK);
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerification verification) {
+        if (!verification.getEmailId().equalsIgnoreCase(otpSendEmailId))
+            return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
+        String verificationStatus = loginService.verifyOtp(verification);
+        if (verificationStatus.equals("Verified"))
+            return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
     }
+
     public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
         Map<String, Object> expectedMap = new HashMap<String, Object>();
         try{
@@ -102,21 +102,17 @@ public class LoginController {
         }
     }
 
-//    @PostMapping("/verify")
-//    public ResponseEntity<?> verifyOtp(@RequestBody OtpVerification verification) {
-//        if (!verification.getEmailId().equalsIgnoreCase(otpSendEmailId))
-//            return new ResponseEntity<>(Collections.singletonMap("Error", "Enter a valid email id"), HttpStatus.NOT_ACCEPTABLE);
-//        String verificationStatus = loginService.verifyOtp(verification);
-//        if (verificationStatus.equals("Verified"))
-//            return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.OK);
-//        return new ResponseEntity<>(Collections.singletonMap("status", verificationStatus), HttpStatus.NOT_ACCEPTABLE);
-//    }
 
-//    @PostMapping("/resend")
-//    public ResponseEntity<?> resendOtp(@RequestBody EmailId emailId){
-//
-//
-//    }
+    @PostMapping("/resend")
+    public ResponseEntity<?> resendOtp(@RequestBody EmailId emailId){
+        String status = loginService.checkForEmail(emailId);
+        if (status != null)
+            return new ResponseEntity<>(Collections.singletonMap("message", status), HttpStatus.NOT_FOUND);
+        loginService.deletePreviousOtp(emailId);
+        Long otpStatus = loginService.sendOtp(emailId);
+        otpSendEmailId = emailId.getEmailId();
+        return new ResponseEntity<>(Collections.singletonMap("message", "OTP Valid for " + otpStatus + " Mins"), HttpStatus.OK);
+    }
 
 
     @Scheduled(fixedRate = 300000)
