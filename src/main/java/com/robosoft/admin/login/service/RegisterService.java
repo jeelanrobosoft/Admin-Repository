@@ -39,9 +39,8 @@ public class RegisterService {
             );
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
             //String publicId = uploadResult.get("public_id").toString();
-            String url = uploadResult.get("secure_url").toString();
 
-            return url;
+            return uploadResult.get("secure_url").toString();
         }
         catch (Exception e)
         {
@@ -59,7 +58,7 @@ public class RegisterService {
         {
             return "Invalid EmailId";
         }
-        if(!register.getProfilePhoto().isEmpty())
+        if(register.getProfilePhoto() != null)
         {
            url = uploadProfilePhoto(register.getProfilePhoto());
         }

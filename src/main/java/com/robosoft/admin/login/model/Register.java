@@ -16,4 +16,13 @@ public class Register {
     private String designation;
     private String description;
     private String url;
+
+    public Register(String emailId, String fullName, String mobileNumber, String designation, String description, String url) {
+        this.emailId = emailId;
+        this.fullName = fullName;
+        this.mobileNumber = mobileNumber;
+        this.designation = designation;
+        this.description = description;
+        this.url = url;
+    }
 }
