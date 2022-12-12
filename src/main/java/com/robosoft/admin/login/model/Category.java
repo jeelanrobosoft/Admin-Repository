@@ -1,3 +1,4 @@
+
 package com.robosoft.admin.login.model;
 
 import lombok.AllArgsConstructor;
@@ -13,3 +14,4 @@ public class Category {
     private String categoryPhoto;
 
 }
+
