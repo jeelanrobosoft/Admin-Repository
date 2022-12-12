@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/superAdmin")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 public class SuperAdminApprovalController {
 
     @Autowired
