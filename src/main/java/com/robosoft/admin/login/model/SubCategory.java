@@ -1,3 +1,4 @@
+
 package com.robosoft.admin.login.model;
 
 public class SubCategory {
@@ -5,3 +6,4 @@ public class SubCategory {
     private Integer subCategoryId;
     private String subCategoryName;
 }
+

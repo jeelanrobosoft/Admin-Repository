@@ -22,7 +22,7 @@ public class LoginDataAccessLayer {
     }
 
     public void deletePreviousOtp(EmailId emailId) {
-        String query = "update otpVerification set status=false where emailId=? and status=true";
+        String query = "update otpVerification set status=false where mobileNumber=? and status=true";
         jdbcTemplate.update(query,emailId.getEmailId());
     }
 

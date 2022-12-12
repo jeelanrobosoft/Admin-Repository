@@ -18,10 +18,12 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            UserAuth auth = jdbcTemplate.queryForObject("select * from authenticate where emailId='" + username + "'", new BeanPropertyRowMapper<>(UserAuth.class));
+            UserAuth auth = jdbcTemplate.queryForObject("select * from authenticate where userName='" + username + "'", new BeanPropertyRowMapper<>(UserAuth.class));
             return new MyUserDetailsImpl(auth);
         } catch (Exception e) {
             throw new UsernameNotFoundException("User not found");
         }
+
+
     }
 }

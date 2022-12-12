@@ -30,6 +30,7 @@ public class SecurityConfiguration {
     private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/resend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register","/admin/refreshToken","admin/resetPassword","/addCourse/overView","/addCourse/chapter","/admin/getProfile"};
  
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

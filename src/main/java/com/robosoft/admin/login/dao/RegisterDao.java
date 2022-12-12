@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class RegisterDao {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
 
     public void adminRegister(Register register, String url) {
@@ -22,7 +22,6 @@ public class RegisterDao {
     }
 
     public void resetPassword(String emailId, String password) {
-        jdbcTemplate.update("UPDATE authenticate SET password = ? WHERE emailId = ?",password,emailId);
+        jdbcTemplate.update("UPDATE authenticate SET password = ? WHERE emailId = ?", password, emailId);
     }
-
 }

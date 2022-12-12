@@ -1,3 +1,4 @@
+
 package com.robosoft.admin.login.model;
 
 import lombok.AllArgsConstructor;
@@ -11,5 +12,6 @@ public class Category {
     private Integer categoryId;
     private String categoryName;
     private String categoryPhoto;
-    private Boolean status = false;
+
 }
+
