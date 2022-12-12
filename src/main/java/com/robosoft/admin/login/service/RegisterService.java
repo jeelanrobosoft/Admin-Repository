@@ -2,7 +2,7 @@ package com.robosoft.admin.login.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.robosoft.admin.login.dao.RegisterDao;
+import com.robosoft.admin.login.dao.AdminDao;
 import com.robosoft.admin.login.model.Register;
 import com.robosoft.admin.login.model.ResetPassword;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class RegisterService {
 
     @Autowired
-    RegisterDao registerDao;
+    AdminDao adminDao;
 
 
     public String uploadProfilePhoto(MultipartFile profilePhoto)
@@ -71,25 +71,29 @@ public class RegisterService {
             return "Invalid Mobile Number";
         }
         try {
-            registerDao.adminRegister(register,url);
-            return "Registration Request Sent You Will Receive the Mail ASAP.";
+            register.getEmailId().matches(adminDao.getAdminEmailId(register.getEmailId()));
+                return "Email Id already Exists";
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return "Registration Failed";
+        catch (Exception exception) {
+            try {
+                adminDao.adminRegister(register, url);
+                return "Registration Request Sent You Will Receive the Mail ASAP.";
+            } catch (Exception e) {
+                return "Registration Failed";
+            }
         }
     }
 
     public String resetPassword(ResetPassword resetPassword) {
         try {
-            String emailId = registerDao.getAdminEmailId(resetPassword.getEmailId());
+            String emailId = adminDao.getAdminEmailId(resetPassword.getEmailId());
             if(emailId != null)
-                registerDao.resetPassword(emailId,new BCryptPasswordEncoder().encode(resetPassword.getPassword()));
+                adminDao.resetPassword(emailId,new BCryptPasswordEncoder().encode(resetPassword.getPassword()));
             return "Password Updated Successfully.";
         }
         catch (Exception exception)
         {
+            exception.printStackTrace();
             return "Invalid Email Id";
         }
     }
