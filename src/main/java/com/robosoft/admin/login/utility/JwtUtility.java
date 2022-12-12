@@ -78,12 +78,12 @@ public class JwtUtility implements Serializable {
         List<SimpleGrantedAuthority> roles = null;
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken).getBody();
         Boolean isAdmin = claims.get("isAdmin", Boolean.class);
-        Boolean isUser = claims.get("isUser", Boolean.class);
+        Boolean isUser = claims.get("isSuperAdmin", Boolean.class);
         if (isAdmin != null && isAdmin == true) {
             roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
         }
         if (isUser != null && isUser == true) {
-            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+            roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"));
         }
         return roles;
     }
