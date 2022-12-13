@@ -98,4 +98,14 @@ public class AdminDao {
         Integer testCount = jdbcTemplate.queryForObject("SELECT COUNT(questionId) FROM questions WHERE testId = ?", Integer.class,testId);
         jdbcTemplate.update("UPDATE test SET questionCount = ? WHERE testId = ?",testCount,testId);
     }
+
+
+    public Boolean getAdminApprovalStatus(String emailId) {
+        return jdbcTemplate.queryForObject("SELECT approvalStatus FROM admin WHERE emailId = ?", Boolean.class,emailId);
+    }
+
+    public void updateRegistration(Register register, String url) {
+        jdbcTemplate.update("UPDATE admin SET profilePhoto = ?,fullName = ?,mobileNumber = ?,designation = ?,description = ?,url = ?,rejectStatus=false WHERE emailId = ?",url,register.getFullName(),
+                register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),register.getEmailId());
+    }
 }

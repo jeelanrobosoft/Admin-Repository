@@ -62,7 +62,7 @@ public class RegisterService {
         {
            url = uploadProfilePhoto(register.getProfilePhoto());
         }
-        Pattern ptrn = Pattern.compile("\\d{10}");
+        Pattern ptrn = Pattern.compile("^\\+(?:[0-9] ?){6,14}[0-9]$");
 
         Matcher phMatcher = ptrn.matcher(register.getMobileNumber());
         if(!phMatcher.matches())
@@ -71,7 +71,10 @@ public class RegisterService {
         }
         try {
             register.getEmailId().matches(adminDao.getAdminEmailId(register.getEmailId()));
-                return "Email Id already Exists";
+            if(!adminDao.getAdminApprovalStatus(register.getEmailId())) {
+                adminDao.updateRegistration(register,url);
+            }
+            return "Email Id already Exists";
         }
         catch (Exception exception) {
             try {
