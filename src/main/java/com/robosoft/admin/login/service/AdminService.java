@@ -1,10 +1,7 @@
 package com.robosoft.admin.login.service;
 
 import com.robosoft.admin.login.dao.AdminDao;
-import com.robosoft.admin.login.dto.ChapterListResponse;
-import com.robosoft.admin.login.dto.QuestionRequest;
-import com.robosoft.admin.login.dto.StudentList;
-import com.robosoft.admin.login.dto.TestRequest;
+import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +68,7 @@ public class AdminService {
 
     public List<ChapterListResponse> getChapterList(Integer courseId) {
         String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<Integer> chapterIds = adminDao.getChapterId(emailId,courseId);
+        List<Integer> chapterIds = adminDao.getChapterId(emailId, courseId);
         List<ChapterListResponse> chapterListResponses = new ArrayList<>();
         for (Integer chapterId : chapterIds) {
             try {
@@ -90,10 +87,35 @@ public class AdminService {
                 adminDao.addQuestions(questions, testId);
             adminDao.getQuestionCount(testId);
             return "Test Added SuccessFully";
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return "Failed";
+        }
+    }
+
+    public String deleteStudent(List<StudentStatusRequest> studentStatusRequests) {
+        if (studentStatusRequests.size() > 0) {
+            try {
+                for (StudentStatusRequest studentList : studentStatusRequests) {
+                    adminDao.deleteStudent(studentList);
+                }
+                return "Student Deleted Successfully";
+            } catch (Exception e) {
+                return "Failed to Deleted";
+            }
+        }
+        return "Failed to Deleted";
+    }
+
+    public String subscribeStudent(StudentStatusRequest studentStatusRequest) {
+        try {
+            Boolean subscribeStatus = adminDao.getEnrollment(studentStatusRequest);
+            if(subscribeStatus)
+                adminDao.unsubscribeStudent(studentStatusRequest);
+            else
+                adminDao.subscribeStudent(studentStatusRequest);
+            return "Subscribed Successfully";
+        } catch (Exception e) {
+            return "Failed to Subscribe";
         }
     }
 }

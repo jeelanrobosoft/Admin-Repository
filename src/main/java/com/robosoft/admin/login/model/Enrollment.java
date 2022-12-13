@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class Enrollment {
     private String userName;
     private String courseId;
+    private Boolean subscribeStatus;
+    private Boolean deleteStatus;
 }
