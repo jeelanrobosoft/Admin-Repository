@@ -71,6 +71,7 @@ public class AdminService {
         List<Integer> chapterIds = adminDao.getChapterId(emailId, courseId);
         List<ChapterListResponse> chapterListResponses = new ArrayList<>();
         for (Integer chapterId : chapterIds) {
+            System.out.println(chapterId);
             try {
                 adminDao.checkForTest(chapterId);
             } catch (Exception e) {
@@ -83,11 +84,13 @@ public class AdminService {
     public String addTest(TestRequest testRequest) {
         try {
             Integer testId = adminDao.addTest(testRequest.getChapterId(), testRequest.getTestName(), testRequest.getTestDuration(), testRequest.getPassingGrade());
-            for (QuestionRequest questions : testRequest.getQuestionRequests())
+            for (QuestionRequest questions : testRequest.getQuestionRequests()) {
                 adminDao.addQuestions(questions, testId);
+            }
             adminDao.getQuestionCount(testId);
             return "Test Added SuccessFully";
         } catch (Exception e) {
+            e.printStackTrace();
             return "Failed";
         }
     }

@@ -27,6 +27,7 @@ public class AdminDao {
 
 
     public void adminRegister(Register register, String url) {
+        System.out.println(url);
         jdbcTemplate.update("INSERT INTO admin(emailId,profilePhoto,fullName,mobileNumber,designation,description,url,approvalStatus) VALUES(?,?,?,?,?,?,?,?)",register.getEmailId(),url,
                 register.getFullName(),register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),false);
     }
@@ -104,8 +105,8 @@ public class AdminDao {
 
     public void getQuestionCount(Integer testId)
     {
-        Integer testCount = jdbcTemplate.queryForObject("SELECT COUNT(questionId) FROM questions WHERE testId = ?", Integer.class,testId);
-        jdbcTemplate.update("UPDATE test SET questionCount = ? WHERE testId = ?",testCount,testId);
+        Integer testCount = jdbcTemplate.queryForObject("SELECT COUNT(questionId) FROM question WHERE testId = ?", Integer.class,testId);
+        jdbcTemplate.update("UPDATE test SET questionsCount = ? WHERE testId = ?",testCount,testId);
     }
 
     public void deleteStudent(StudentStatusRequest studentList) {

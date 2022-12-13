@@ -15,7 +15,7 @@ public class SuperAdminApproval {
     public int addToAuthenticate(Admin admin, String password)
     {
         password =  new BCryptPasswordEncoder().encode(password);
-       return jdbcTemplate.update("insert into authenticate(emailId,password,role) values(?,?,?)", admin.getEmailId(), password,"ROLE_ADMIN");
+       return jdbcTemplate.update("insert into authenticate(userName,password,role) values(?,?,?)", admin.getEmailId(), password,"ROLE_ADMIN");
     }
 
     public Integer deleteFromAuthenticate(Admin admin)
