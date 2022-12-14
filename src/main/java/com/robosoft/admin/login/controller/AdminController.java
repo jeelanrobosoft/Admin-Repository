@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
+@RequestMapping("/admin")
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 public class AdminController {
 
@@ -72,5 +73,10 @@ public class AdminController {
         if (s != null)
             return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
         return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
+    }
+
+    @GetMapping("/dashBoard/header")
+    public ResponseEntity<?> getDashBoardHeader(){
+        return new ResponseEntity<>(adminService.getDashBoardHeader(),HttpStatus.OK);
     }
 }
