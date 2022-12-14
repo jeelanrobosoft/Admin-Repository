@@ -96,9 +96,12 @@ public class AdminController {
         return new ResponseEntity<>(adminService.getDashBoardHeader(), HttpStatus.OK);
     }
 
-//    @GetMapping("/QuestionAndAns")
-//    public ResponseEntity<?> getQuestionsAndAnswers(@RequestParam Integer courseId)
-//    {
-//
-//    }
+    @GetMapping("/QuestionAndAns")
+    public ResponseEntity<?> getQuestionsAndAnswers(@RequestParam Integer chapterId)
+    {
+        TestRequest testRequest = adminService.getQuestionsAndAnswers(chapterId);
+        if(testRequest != null)
+            return new ResponseEntity<>(testRequest,HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("message","null"),HttpStatus.OK);
+    }
 }

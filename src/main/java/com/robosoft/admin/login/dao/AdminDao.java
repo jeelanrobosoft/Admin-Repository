@@ -1,9 +1,6 @@
 package com.robosoft.admin.login.dao;
 
-import com.robosoft.admin.login.dto.ChapterListResponse;
-import com.robosoft.admin.login.dto.QuestionRequest;
-import com.robosoft.admin.login.dto.StudentList;
-import com.robosoft.admin.login.dto.StudentStatusRequest;
+import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.Enrollment;
 import com.robosoft.admin.login.model.Register;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,5 +148,22 @@ public class AdminDao {
 
     public Integer getOverallResult(String userName) {
         return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class,userName);
+    }
+
+    public TestRequest getTestDetails(Integer chapterId) {
+        return jdbcTemplate.queryForObject("SELECT testId,testName,chapterId,testDuration,passingGrade FROM test WHERE chapterId = ?",new BeanPropertyRowMapper<>(TestRequest.class),chapterId);
+    }
+
+    public List<QuestionRequest> getQuestionAndAns(Integer testId) {
+        return jdbcTemplate.query("SELECT questionId,questionName,option_1,option_2,option_3,option_4,correctAnswer FROM question WHERE testId = ?",new BeanPropertyRowMapper<>(QuestionRequest.class),testId);
+    }
+
+    public void editTest(Integer testId, String testName, String testDuration, Integer chapterId, Integer passingGrade) {
+        jdbcTemplate.update("UPDATE test SET testName = ?,testDuration = ?,chapterId = ? passingGrade = ? WHERE testId = ?",testName,testDuration,chapterId,passingGrade,testId);
+    }
+
+    public void editQuestion(QuestionRequest questionRequest) {
+        jdbcTemplate.update("UPDATE question SET questionName = ?,option_1 = ?,option_2 = ?, option_3 = ?,option_4 = ? correctAnswer = ? WHERE questionId = ?",
+                questionRequest.getQuestionName(),questionRequest.getOption_1(),questionRequest.getOption_2(),questionRequest.getOption_3(),questionRequest.getOption_4(),questionRequest.getCorrectAnswer(),questionRequest.getQuestionId());
     }
 }

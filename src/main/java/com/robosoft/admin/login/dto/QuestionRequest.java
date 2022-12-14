@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestionRequest {
+    private Integer questionId;
     private String questionName;
     private String option_1;
     private String option_2;
