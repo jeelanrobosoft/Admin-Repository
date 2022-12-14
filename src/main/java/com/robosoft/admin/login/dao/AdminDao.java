@@ -3,6 +3,7 @@ package com.robosoft.admin.login.dao;
 import com.robosoft.admin.login.dto.ChapterListResponse;
 import com.robosoft.admin.login.dto.QuestionRequest;
 import com.robosoft.admin.login.dto.StudentList;
+import com.robosoft.admin.login.dto.StudentStatusRequest;
 import com.robosoft.admin.login.model.Enrollment;
 import com.robosoft.admin.login.model.Register;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AdminDao {
@@ -25,6 +27,7 @@ public class AdminDao {
 
 
     public void adminRegister(Register register, String url) {
+        System.out.println(url);
         jdbcTemplate.update("INSERT INTO admin(emailId,profilePhoto,fullName,mobileNumber,designation,description,url,approvalStatus) VALUES(?,?,?,?,?,?,?,?)",register.getEmailId(),url,
                 register.getFullName(),register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),false);
     }
@@ -45,7 +48,14 @@ public class AdminDao {
         List<StudentList> studentLists = new ArrayList<>();
         List<Enrollment> enrollments = jdbcTemplate.query("SELECT * from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? limit ?,?", new BeanPropertyRowMapper<>(Enrollment.class),emailId,pageNumber,pageLimit);
         for(Enrollment enrollment : enrollments) {
-            StudentList studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class),enrollment.getCourseId(),enrollment.getUserName());
+            StudentList studentList;
+            if(enrollment.getSubscribeStatus()){
+                studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+            }
+            else
+            {
+                studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ? and enrollment.deleteStatus = false", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+            }
             studentLists.add(studentList);
         }
         return studentLists;
@@ -86,7 +96,7 @@ public class AdminDao {
             ps.setInt(4, passingGrade);
             return ps;
         }, keyHolder);
-        return keyHolder.getKey().intValue();
+        return Objects.requireNonNull(keyHolder.getKey()).intValue();
     }
 
     public void addQuestions(QuestionRequest questions, Integer testId) {
@@ -95,8 +105,26 @@ public class AdminDao {
 
     public void getQuestionCount(Integer testId)
     {
-        Integer testCount = jdbcTemplate.queryForObject("SELECT COUNT(questionId) FROM questions WHERE testId = ?", Integer.class,testId);
-        jdbcTemplate.update("UPDATE test SET questionCount = ? WHERE testId = ?",testCount,testId);
+        Integer testCount = jdbcTemplate.queryForObject("SELECT COUNT(questionId) FROM question WHERE testId = ?", Integer.class,testId);
+        jdbcTemplate.update("UPDATE test SET questionsCount = ? WHERE testId = ?",testCount,testId);
+    }
+
+    public void deleteStudent(StudentStatusRequest studentList) {
+        jdbcTemplate.update("UPDATE enrollment SET deleteStatus = true WHERE userName = ? AND courseId = ?",studentList.getUserName(),studentList.getCourseId());
+    }
+
+    public void subscribeStudent(StudentStatusRequest studentStatusRequest) {
+        jdbcTemplate.update("UPDATE enrollment SET subscribe = true WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
+
+    }
+
+    public Boolean getEnrollment(StudentStatusRequest studentStatusRequest) {
+        return jdbcTemplate.queryForObject("SELECT subscribeStatus from enrollment WHERE userName = ? AND courseId = ?", Boolean.class,studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
+    }
+
+    public void unsubscribeStudent(StudentStatusRequest studentStatusRequest) {
+        jdbcTemplate.update("UPDATE enrollment SET subscribe = false WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
+
     }
 
 

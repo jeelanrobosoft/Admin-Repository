@@ -35,7 +35,12 @@ public class LoginDataAccessLayer {
 
     public String fetchOtpForGivenEmail(OtpVerification verification) {
         String query = "select otp,expiryTime from otpVerification where mobileNumber='" + verification.getEmailId() + "' and status=true";
-        OtpValidity otpVerification = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(OtpValidity.class));
+        OtpValidity otpVerification;
+        try{
+          otpVerification = jdbcTemplate.queryForObject(query, new BeanPropertyRowMapper<>(OtpValidity.class));
+        } catch (Exception e){
+        return "Verification Fail";
+        }
         if (otpVerification.getOtp().equals(verification.getOtp()) && ((System.currentTimeMillis() / 1000) <= Long.parseLong(otpVerification.getExpiryTime()))) {
             jdbcTemplate.update("update otpVerification set status=false where mobileNumber='" + verification.getEmailId() + "' and status=true");
             return "Verified";

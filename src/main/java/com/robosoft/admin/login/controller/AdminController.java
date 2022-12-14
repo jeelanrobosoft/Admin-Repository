@@ -2,6 +2,7 @@ package com.robosoft.admin.login.controller;
 
 import com.robosoft.admin.login.dto.ChapterListResponse;
 import com.robosoft.admin.login.dto.StudentList;
+import com.robosoft.admin.login.dto.StudentStatusRequest;
 import com.robosoft.admin.login.dto.TestRequest;
 import com.robosoft.admin.login.model.ChangePassword;
 import com.robosoft.admin.login.service.AdminService;
@@ -14,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin")
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
+@RequestMapping("/admin")
 public class AdminController {
 
     @Autowired
@@ -75,8 +76,26 @@ public class AdminController {
         return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteStudent")
+    public ResponseEntity<?> deleteStudent(@RequestBody List<StudentStatusRequest> studentStatusRequests)
+    {
+        String s = adminService.deleteStudent(studentStatusRequests);
+        if (s != null)
+            return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
+    }
+
+    @PutMapping("/subscribe")
+    public ResponseEntity<?> subscribeStudent(@RequestBody StudentStatusRequest studentStatusRequest)
+    {
+        String s = adminService.subscribeStudent(studentStatusRequest);
+        if (s != null)
+            return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
+        return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
+        
     @GetMapping("/dashBoard/header")
     public ResponseEntity<?> getDashBoardHeader(){
         return new ResponseEntity<>(adminService.getDashBoardHeader(),HttpStatus.OK);
+
     }
 }

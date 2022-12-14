@@ -10,5 +10,5 @@ public class TestRequest {
     private Integer chapterId;
     private String testDuration;
     private Integer passingGrade;
-    private List<QuestionRequest>questionRequests;
+    private List<QuestionRequest> questionRequests;
 }
