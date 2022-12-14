@@ -41,13 +41,10 @@ public class LoginController {
     private MyUserDetailsService myUserDetailsService;
     @Autowired
     private LoginService loginService;
-
     @Autowired
     RegisterService registerService;
 
     private String otpSendEmailId;
-
-
 
     @PutMapping("/login")
     public ResponseEntity<?> login(@RequestBody Authenticate adminAuth) throws Exception {
