@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 @RequestMapping("/admin")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 public class AdminController {
 
     @Autowired
