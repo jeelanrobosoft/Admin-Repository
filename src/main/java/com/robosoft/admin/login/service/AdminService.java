@@ -71,7 +71,6 @@ public class AdminService {
         List<Integer> chapterIds = adminDao.getChapterId(emailId, courseId);
         List<ChapterListResponse> chapterListResponses = new ArrayList<>();
         for (Integer chapterId : chapterIds) {
-            System.out.println(chapterId);
             try {
                 adminDao.checkForTest(chapterId);
             } catch (Exception e) {
@@ -112,12 +111,16 @@ public class AdminService {
     public String subscribeStudent(StudentStatusRequest studentStatusRequest) {
         try {
             Boolean subscribeStatus = adminDao.getEnrollment(studentStatusRequest);
-            if (subscribeStatus)
+            if (subscribeStatus) {
                 adminDao.unsubscribeStudent(studentStatusRequest);
-            else
+                return "Unsubscribed Successfully";
+            }
+            else {
                 adminDao.subscribeStudent(studentStatusRequest);
-            return "Subscribed Successfully";
+                return "Subscribed Successfully";
+            }
         } catch (Exception e) {
+            e.printStackTrace();
             return "Failed to Subscribe";
         }
     }

@@ -38,6 +38,7 @@ public class AdminController {
                 return new ResponseEntity<>(Collections.singletonMap("message", "null"), HttpStatus.OK);
             return new ResponseEntity<>(studentLists, HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(Collections.singletonMap("Error", "Something Went Wrong"), HttpStatus.NOT_FOUND);
         }
     }
@@ -94,4 +95,10 @@ public class AdminController {
     public ResponseEntity<?> getDashBoardHeader() {
         return new ResponseEntity<>(adminService.getDashBoardHeader(), HttpStatus.OK);
     }
+
+//    @GetMapping("/QuestionAndAns")
+//    public ResponseEntity<?> getQuestionsAndAnswers(@RequestParam Integer courseId)
+//    {
+//
+//    }
 }

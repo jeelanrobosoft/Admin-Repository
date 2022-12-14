@@ -17,5 +17,5 @@ public class StudentList {
     private String courseName;
     private String completedDate;
     private Boolean courseCompletedStatus;
-    private Boolean subscribe;
+    private Boolean subscribeStatus;
 }
