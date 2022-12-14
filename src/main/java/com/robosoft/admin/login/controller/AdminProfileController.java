@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/admin")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
 public class AdminProfileController {
 
     @Autowired

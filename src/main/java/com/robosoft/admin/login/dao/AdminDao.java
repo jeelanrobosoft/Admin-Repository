@@ -108,4 +108,16 @@ public class AdminDao {
         jdbcTemplate.update("UPDATE admin SET profilePhoto = ?,fullName = ?,mobileNumber = ?,designation = ?,description = ?,url = ?,rejectStatus=false WHERE emailId = ?",url,register.getFullName(),
                 register.getMobileNumber(),register.getDesignation(),register.getDescription(),register.getUrl(),register.getEmailId());
     }
+
+    public Integer getTotalStudentsEnrolled(String userName) {
+        return jdbcTemplate.queryForObject("select count(enrollment.courseId) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class,userName);
+    }
+
+    public Integer getTotalCoursesAdded(String userName) {
+        return jdbcTemplate.queryForObject("select count(*) from course where adminId=? and publishstatus=true", Integer.class,userName);
+    }
+
+    public Integer getOverallResult(String userName) {
+        return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class,userName);
+    }
 }

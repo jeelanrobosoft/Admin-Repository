@@ -1,10 +1,7 @@
 package com.robosoft.admin.login.service;
 
 import com.robosoft.admin.login.dao.AdminDao;
-import com.robosoft.admin.login.dto.ChapterListResponse;
-import com.robosoft.admin.login.dto.QuestionRequest;
-import com.robosoft.admin.login.dto.StudentList;
-import com.robosoft.admin.login.dto.TestRequest;
+import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,5 +92,14 @@ public class AdminService {
         {
             return "Failed";
         }
+    }
+
+    public DashBoardHeaderResponse getDashBoardHeader() {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
+        Integer totalCoursesAdded = adminDao.getTotalCoursesAdded(userName);
+        Integer overallResult = adminDao.getOverallResult(userName);
+        return new DashBoardHeaderResponse(totalStudentsEnrolled,totalCoursesAdded,overallResult);
+
     }
 }
