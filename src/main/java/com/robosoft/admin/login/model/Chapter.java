@@ -14,6 +14,7 @@ public class Chapter implements Comparable<Chapter>{
     private Integer chapterNumber;
     private String chapterName;
     private String chapterDuration;
+    private Boolean uploadStatus;
 
     public Chapter(String chapterDuration) {
         this.chapterDuration = chapterDuration;

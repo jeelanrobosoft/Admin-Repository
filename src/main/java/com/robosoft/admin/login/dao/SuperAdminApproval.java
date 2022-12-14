@@ -23,4 +23,9 @@ public class SuperAdminApproval {
         jdbcTemplate.update("delete from admin where emailId=?",admin.getEmailId());
         return jdbcTemplate.update("delete from authenticate where emailId=?",admin.getEmailId());
     }
+
+    public void updateStatus(String adminId)
+    {
+       jdbcTemplate.update("UPDATE admin SET approvalStatus=? WHERE emailId=?",true,adminId);
+    }
 }

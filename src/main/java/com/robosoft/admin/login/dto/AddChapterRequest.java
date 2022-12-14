@@ -9,8 +9,9 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChapterDataRequest {
+public class AddChapterRequest {
+    private Integer courseId;
+    private String courseName;
     private Integer chapterId;
-    private String chapterName;
-    private List<LessonDataRequest> lessonsList;
+    private List<ChapterDataRequest> chapterDataRequestList;
 }

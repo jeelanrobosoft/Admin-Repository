@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LessonDataRequest {
-    private Integer chapterId;
     private String lessonName;
     private String lessonDuration;
     private String videoLink;

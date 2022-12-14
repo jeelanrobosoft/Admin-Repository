@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Admin {
     private String emailId;
     private MultipartFile profilePhoto;

@@ -1,6 +1,7 @@
 package com.robosoft.admin.login.controller;
 
 import com.robosoft.admin.login.dto.AddCategoryResponse;
+import com.robosoft.admin.login.dto.AddCourseRequest;
 import com.robosoft.admin.login.dto.AddSubCategoryResponse;
 import com.robosoft.admin.login.model.AddCategory;
 import com.robosoft.admin.login.model.AddSubCategory;
@@ -11,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.robosoft.admin.login.dto.AddCourseRequest;
-import com.robosoft.admin.login.dto.ChapterDataRequest;
-import com.robosoft.admin.login.model.Overview;
+import com.robosoft.admin.login.dto.AddChapterRequest;
 import com.robosoft.admin.login.service.OverViewData;
 import java.text.ParseException;
 
@@ -83,28 +82,36 @@ public class AddCourseController {
         AddSubCategoryResponse response = new AddSubCategoryResponse(subCategoryId,status);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-    
-    
 
     @PostMapping("/overView")
-    public ResponseEntity<?> addOverView(@ModelAttribute Overview overview)
-    {
-        String response = overViewData.addOverView(overview);
+    public ResponseEntity<?> addOverView(@ModelAttribute AddCourseRequest addCourseRequest) throws IOException {
+        String response = overViewData.addCourseOverView(addCourseRequest);
         if(response.equals("Overview added"))
         {
             return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
         }
-        return new ResponseEntity<>(Collections.singletonMap("message", "Failed"), HttpStatus.NOT_MODIFIED);
+        return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
     }
 
     @PostMapping("/chapter")
-    public ResponseEntity<?> addChapter(@RequestBody AddCourseRequest addCourseRequest) throws ParseException {
+    public ResponseEntity<?> addChapter(@RequestBody AddChapterRequest addCourseRequest) throws ParseException {
           String response = overViewData.addChapter(addCourseRequest);
           if(response.equals("Chapter Data added"))
           {
               return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
           }
         return new ResponseEntity<>(Collections.singletonMap("message", "Failed"), HttpStatus.NOT_MODIFIED);
+    }
+
+    @PutMapping("/publishToWeb")
+    public ResponseEntity<?> publishToWeb(@RequestBody Integer courseId)
+    {
+        String response = overViewData.publishToWeb(courseId);
+        if(response.equals("Course Published"))
+        {
+            return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(Collections.singletonMap("message", "Failed To Publish"), HttpStatus.NOT_MODIFIED);
     }
 
 }
