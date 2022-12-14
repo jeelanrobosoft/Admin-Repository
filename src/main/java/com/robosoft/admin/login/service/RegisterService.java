@@ -58,10 +58,10 @@ public class RegisterService {
         {
             return "Invalid EmailId";
         }
-        if(register.getProfilePhoto() != null)
-        {
-           url = uploadProfilePhoto(register.getProfilePhoto());
-        }
+//        if(register.getProfilePhoto() != null)
+//        {
+////           url = uploadProfilePhoto(register.getProfilePhoto());
+//        }
         Pattern ptrn = Pattern.compile("\\d{10}");
 
         Matcher phMatcher = ptrn.matcher(register.getMobileNumber());
