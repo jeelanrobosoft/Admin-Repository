@@ -18,7 +18,7 @@ public class RegisterController {
     RegisterService registerService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> adminRegister(@ModelAttribute Register register){
+    public ResponseEntity<?> adminRegister(@RequestBody Register register){
         String s = registerService.adminRegister(register);
         if(s!= null)
             return new ResponseEntity<>(Collections.singletonMap("message",s), HttpStatus.OK);
