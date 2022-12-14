@@ -55,8 +55,7 @@ public class AdminController {
     }
 
     @GetMapping("/chapterList")
-    public ResponseEntity<?> getChapterList(@RequestParam Integer courseId)
-    {
+    public ResponseEntity<?> getChapterList(@RequestParam Integer courseId) {
         try {
             List<ChapterListResponse> chapterList = adminService.getChapterList(courseId);
             if (chapterList.isEmpty())
@@ -68,8 +67,7 @@ public class AdminController {
     }
 
     @PostMapping("/addTest")
-    public ResponseEntity<?> addTest(@RequestBody TestRequest testRequest)
-    {
+    public ResponseEntity<?> addTest(@RequestBody TestRequest testRequest) {
         String s = adminService.addTest(testRequest);
         if (s != null)
             return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
@@ -77,8 +75,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/deleteStudent")
-    public ResponseEntity<?> deleteStudent(@RequestBody List<StudentStatusRequest> studentStatusRequests)
-    {
+    public ResponseEntity<?> deleteStudent(@RequestBody List<StudentStatusRequest> studentStatusRequests) {
         String s = adminService.deleteStudent(studentStatusRequests);
         if (s != null)
             return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
@@ -86,16 +83,15 @@ public class AdminController {
     }
 
     @PutMapping("/subscribe")
-    public ResponseEntity<?> subscribeStudent(@RequestBody StudentStatusRequest studentStatusRequest)
-    {
+    public ResponseEntity<?> subscribeStudent(@RequestBody StudentStatusRequest studentStatusRequest) {
         String s = adminService.subscribeStudent(studentStatusRequest);
         if (s != null)
             return new ResponseEntity<>(Collections.singletonMap("message", s), HttpStatus.OK);
         return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
-        
-    @GetMapping("/dashBoard/header")
-    public ResponseEntity<?> getDashBoardHeader(){
-        return new ResponseEntity<>(adminService.getDashBoardHeader(),HttpStatus.OK);
+    }
 
+    @GetMapping("/dashBoard/header")
+    public ResponseEntity<?> getDashBoardHeader() {
+        return new ResponseEntity<>(adminService.getDashBoardHeader(), HttpStatus.OK);
     }
 }

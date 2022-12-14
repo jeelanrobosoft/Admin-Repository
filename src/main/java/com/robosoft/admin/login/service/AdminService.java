@@ -112,7 +112,7 @@ public class AdminService {
     public String subscribeStudent(StudentStatusRequest studentStatusRequest) {
         try {
             Boolean subscribeStatus = adminDao.getEnrollment(studentStatusRequest);
-            if(subscribeStatus)
+            if (subscribeStatus)
                 adminDao.unsubscribeStudent(studentStatusRequest);
             else
                 adminDao.subscribeStudent(studentStatusRequest);
@@ -120,6 +120,7 @@ public class AdminService {
         } catch (Exception e) {
             return "Failed to Subscribe";
         }
+    }
         
     public DashBoardHeaderResponse getDashBoardHeader() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -130,3 +131,5 @@ public class AdminService {
 
     }
 }
+
+
