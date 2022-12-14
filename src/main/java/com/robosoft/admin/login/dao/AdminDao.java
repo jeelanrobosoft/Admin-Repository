@@ -48,15 +48,19 @@ public class AdminDao {
         List<StudentList> studentLists = new ArrayList<>();
         List<Enrollment> enrollments = jdbcTemplate.query("SELECT * from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? limit ?,?", new BeanPropertyRowMapper<>(Enrollment.class),emailId,pageNumber,pageLimit);
         for(Enrollment enrollment : enrollments) {
-            StudentList studentList;
-            if(enrollment.getSubscribeStatus()){
-                studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+            StudentList studentList = new StudentList();
+            try {
+                if (enrollment.getSubscribeStatus()) {
+                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+                    studentLists.add(studentList);
+                } else {
+                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ? and enrollment.deleteStatus = false", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+                    studentLists.add(studentList);
+                }
             }
-            else
+            catch (Exception e)
             {
-                studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ? and enrollment.deleteStatus = false", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
             }
-            studentLists.add(studentList);
         }
         return studentLists;
     }
@@ -114,7 +118,7 @@ public class AdminDao {
     }
 
     public void subscribeStudent(StudentStatusRequest studentStatusRequest) {
-        jdbcTemplate.update("UPDATE enrollment SET subscribe = true WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
+        jdbcTemplate.update("UPDATE enrollment SET subscribeStatus = true WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
 
     }
 
@@ -123,7 +127,7 @@ public class AdminDao {
     }
 
     public void unsubscribeStudent(StudentStatusRequest studentStatusRequest) {
-        jdbcTemplate.update("UPDATE enrollment SET subscribe = false WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
+        jdbcTemplate.update("UPDATE enrollment SET subscribeStatus = false WHERE userName = ? AND courseId = ?",studentStatusRequest.getUserName(),studentStatusRequest.getCourseId());
 
     }
 
