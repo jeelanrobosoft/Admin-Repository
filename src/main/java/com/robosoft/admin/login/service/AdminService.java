@@ -72,28 +72,42 @@ public class AdminService {
         List<ChapterListResponse> chapterListResponses = new ArrayList<>();
         for (Integer chapterId : chapterIds) {
             try {
-                adminDao.checkForTest(chapterId);
-            } catch (Exception e) {
                 chapterListResponses.add(adminDao.getChapterDetails(chapterId));
+            } catch (Exception e) {
+
             }
         }
         return chapterListResponses;
     }
 
     public String addTest(TestRequest testRequest) {
-        try {
-            Integer testId = adminDao.addTest(testRequest.getChapterId(), testRequest.getTestName(), testRequest.getTestDuration(), testRequest.getPassingGrade());
-            for (QuestionRequest questions : testRequest.getQuestionRequests()) {
-                adminDao.addQuestions(questions, testId);
+        if(testRequest.getTestId() != null)
+        {
+            try {
+                editTest(testRequest);
+                return "Test Updated SuccessFully";
             }
-            adminDao.getQuestionCount(testId);
-            return "Test Added SuccessFully";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed";
+            catch (Exception e)
+            {
+                return "Failed";
+            }
+
+        }
+        else {
+            try {
+                Integer testId = adminDao.addTest(testRequest.getChapterId(), testRequest.getTestName(), testRequest.getTestDuration(), testRequest.getPassingGrade());
+                for (QuestionRequest questions : testRequest.getQuestionRequests()) {
+                    adminDao.addQuestions(questions, testId);
+                }
+                adminDao.getQuestionCount(testId);
+                return "Test Added SuccessFully";
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Failed";
+            }
         }
     }
-    
+
     public String deleteStudent(List<StudentStatusRequest> studentStatusRequests) {
         if (studentStatusRequests.size() > 0) {
             try {
@@ -114,8 +128,7 @@ public class AdminService {
             if (subscribeStatus) {
                 adminDao.unsubscribeStudent(studentStatusRequest);
                 return "Unsubscribed Successfully";
-            }
-            else {
+            } else {
                 adminDao.subscribeStudent(studentStatusRequest);
                 return "Subscribed Successfully";
             }
@@ -124,14 +137,37 @@ public class AdminService {
             return "Failed to Subscribe";
         }
     }
-        
+
     public DashBoardHeaderResponse getDashBoardHeader() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
         Integer totalCoursesAdded = adminDao.getTotalCoursesAdded(userName);
         Integer overallResult = adminDao.getOverallResult(userName);
-        return new DashBoardHeaderResponse(totalStudentsEnrolled,totalCoursesAdded,overallResult);
+        return new DashBoardHeaderResponse(totalStudentsEnrolled, totalCoursesAdded, overallResult);
 
+    }
+
+    public TestRequest getQuestionsAndAnswers(Integer chapterId) {
+        try {
+            TestRequest testRequest = adminDao.getTestDetails(chapterId);
+            List<QuestionRequest> questionRequests = adminDao.getQuestionAndAns(testRequest.getTestId());
+            testRequest.setQuestionRequests(questionRequests);
+            return testRequest;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public void editTest(TestRequest testRequest){
+            adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
+            for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
+                if(questionRequest.getQuestionId() != null)
+                    adminDao.editQuestion(questionRequest);
+                else
+                    adminDao.addQuestions(questionRequest,testRequest.getTestId());
+            }
     }
 }
 
