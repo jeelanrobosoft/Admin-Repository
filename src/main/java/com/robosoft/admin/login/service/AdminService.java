@@ -94,7 +94,7 @@ public class AdminService {
             return "Failed";
         }
     }
-
+    
     public String deleteStudent(List<StudentStatusRequest> studentStatusRequests) {
         if (studentStatusRequests.size() > 0) {
             try {
@@ -120,5 +120,13 @@ public class AdminService {
         } catch (Exception e) {
             return "Failed to Subscribe";
         }
+        
+    public DashBoardHeaderResponse getDashBoardHeader() {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
+        Integer totalCoursesAdded = adminDao.getTotalCoursesAdded(userName);
+        Integer overallResult = adminDao.getOverallResult(userName);
+        return new DashBoardHeaderResponse(totalStudentsEnrolled,totalCoursesAdded,overallResult);
+
     }
 }

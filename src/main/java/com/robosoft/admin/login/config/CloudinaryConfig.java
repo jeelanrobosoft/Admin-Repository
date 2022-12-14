@@ -27,6 +27,7 @@ public class CloudinaryConfig {
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
             //String publicId = uploadResult.get("public_id").toString();
             String url = uploadResult.get("secure_url").toString();
+            System.out.println(url);
 
             return url;
         }

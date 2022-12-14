@@ -99,7 +99,9 @@ public class LoginController {
         if(expectedMap == null)
             return new ResponseEntity<>(Collections.singletonMap("Error" , "Token Not Expired"), HttpStatus.NOT_ACCEPTABLE);
         String token = jwtUtility.doGenerateRefreshToken(expectedMap, expectedMap.get("sub").toString());
-        return new ResponseEntity<>(new JwtResponse(token),HttpStatus.OK);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("refreshToken",token);
+        return ResponseEntity.ok().headers(headers).body(Collections.singletonMap("status","Refresh Token Generated"));
     }
 
     public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
@@ -138,7 +140,7 @@ public class LoginController {
 
 
 
-    @Scheduled(fixedRate = 300000)
+    @Scheduled(fixedRate = 3600000)
     public void eventScheduler() {
         otpSendEmailId = null;
     }

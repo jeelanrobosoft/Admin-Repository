@@ -1,14 +1,13 @@
 package com.robosoft.admin.login.controller;
 
 import com.robosoft.admin.login.model.Admin;
+import com.robosoft.admin.login.model.ProfileDetails;
 import com.robosoft.admin.login.service.AdminProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 
 import java.util.Collections;
 import java.util.Optional;
@@ -30,6 +29,14 @@ public class AdminProfileController {
             return ResponseEntity.of(Optional.of(admin));
         }
         return new ResponseEntity<>(Collections.singletonMap("message", "Invalid Credentials"), HttpStatus.OK);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<?> saveProfileDetails(@ModelAttribute ProfileDetails details){
+        String status = adminProfileService.saveProfileDetails(details);
+        if(status == null)
+            return  new ResponseEntity<>(Collections.singletonMap("message","Profile updated successfully"),HttpStatus.OK);
+        return  new ResponseEntity<>(Collections.singletonMap("Error",status),HttpStatus.NOT_ACCEPTABLE);
     }
 
 }

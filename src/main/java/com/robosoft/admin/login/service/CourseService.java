@@ -87,7 +87,7 @@ public class CourseService {
         }
         return "Invalid Category Id";
     }
-    public int checkStringContainsNumberOrNot(String s) {
+    public static int  checkStringContainsNumberOrNot(String s) {
         if (s == null)
             return -1;
         else if (s.isEmpty())
