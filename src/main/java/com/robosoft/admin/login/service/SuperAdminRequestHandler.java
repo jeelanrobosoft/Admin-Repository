@@ -59,5 +59,9 @@ public class SuperAdminRequestHandler {
         }
         return details;
     }
+
+    public List<Register> getDeletedAdminDetails() {
+        return superAdminApproval.deletedAdminList();
+    }
 }
 

@@ -14,6 +14,7 @@ public class StudentList {
     private String userName;
     private String fullName;
     private String joinDate;
+    private  Integer courseId;
     private String courseName;
     private String completedDate;
     private Boolean courseCompletedStatus;
