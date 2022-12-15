@@ -39,6 +39,9 @@ public class SuperAdminApproval {
         Integer totalNumberOfAdmins = jdbcTemplate.queryForObject("select count(*) from admin where approvalStatus=true and emailId!='akjeelan22@gmail.com'", Integer.class);
         Integer totalCourses = jdbcTemplate.queryForObject("select count(*) from course", Integer.class);
         return new AdminDashBoardDetails(totalNumberOfAdmins,totalCourses);
+    }
 
+    public List<Register> deletedAdminList() {
+        return jdbcTemplate.query("select * from admin where rejectStatus=true and emailId!='akjeelan22@gmail.com'",new BeanPropertyRowMapper<>(Register.class));
     }
 }

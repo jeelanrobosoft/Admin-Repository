@@ -3,6 +3,7 @@ package com.robosoft.admin.login.service;
 import com.robosoft.admin.login.dao.AdminDao;
 import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
+import com.robosoft.admin.login.model.CourseId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,13 +54,6 @@ public class AdminService {
         }
     }
 
-    public List<StudentList> getStudentList(int pageNumber, int pageLimit) {
-        String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<Long> list = this.getOffsetUsingCustomLimit(pageNumber, pageLimit);
-        long limit = list.get(0);
-        long offset = list.get(1);
-        return adminDao.getStudentList(emailId, offset, limit);
-    }
 
     public List<StudentList> getStudentListWithoutPagination() {
         String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -81,8 +75,7 @@ public class AdminService {
     }
 
     public String addTest(TestRequest testRequest) {
-        if(testRequest.getTestId() != null)
-        {
+        if (testRequest.getTestId() != null) {
             try {
                 editTest(testRequest);
                 return "Test Updated SuccessFully";
@@ -93,8 +86,7 @@ public class AdminService {
                 return "Failed";
             }
 
-        }
-        else {
+        } else {
             try {
                 Integer testId = adminDao.addTest(testRequest.getChapterId(), testRequest.getTestName(), testRequest.getTestDuration(), testRequest.getPassingGrade());
                 for (QuestionRequest questions : testRequest.getQuestionRequests()) {
@@ -139,6 +131,22 @@ public class AdminService {
         }
     }
 
+        public void editTest(TestRequest testRequest){
+            adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
+            for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
+                if(questionRequest.getQuestionId() != null) {
+                    if(questionRequest.isDeleteStatus() == true)
+                    {
+                        adminDao.deleteQuestion(questionRequest);
+                    }
+                    else
+                    {
+                        adminDao.editQuestion(questionRequest);
+                    }
+                }
+           }
+        }
+
     public DashBoardHeaderResponse getDashBoardHeader() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
@@ -154,27 +162,59 @@ public class AdminService {
             List<QuestionRequest> questionRequests = adminDao.getQuestionAndAns(testRequest.getTestId());
             testRequest.setQuestionRequests(questionRequests);
             return testRequest;
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public void editTest(TestRequest testRequest){
-            adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
-            for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
-                if(questionRequest.getQuestionId() != null) {
-                    if(questionRequest.isDeleteStatus())
-                    {
-                        adminDao.deleteQuestion(questionRequest);
-                    }
-                    else
-                    {
-                        adminDao.editQuestion(questionRequest);
-                    }
-                }
+
+    public List<CourseResponse> recentlyAddedCourseWithoutPagination() {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<CourseResponse> courseResponseList = new ArrayList<>();
+        List<CourseId> courseIdList = adminDao.recentlyAddedCourseWithoutPagination(userName);
+        for (CourseId courseId : courseIdList) {
+            CourseResponse courseResponse = new CourseResponse();
+            if (courseId.isUploadStatus() == false) {
+                courseResponse = adminDao.GetCourses(userName, courseId.getCourseId());
+                courseResponse.setUploadedStatus(false);
+                courseResponseList.add(courseResponse);
+                continue;
             }
+            courseResponse = adminDao.GetCourses(userName, courseId.getCourseId());
+            courseResponse.setUploadedStatus(true);
+            courseResponseList.add(courseResponse);
+        }
+        return courseResponseList;
+    }
+    public List<StudentList> getStudentList(int pageNumber, int pageLimit) {
+        String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Long> list = this.getOffsetUsingCustomLimit(pageNumber, pageLimit);
+        long limit = list.get(0);
+        long offset = list.get(1);
+        return adminDao.getStudentList(emailId, offset, limit);
+    }
+
+    public List<CourseResponse> getCoursesAdded(int pageNumber, int pageLimit) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Long> list = this.getOffsetUsingCustomLimit(pageNumber,pageLimit);
+        List<CourseResponse> courseResponseList = new ArrayList<>();
+        long limit = list.get(0);
+        long offset = list.get(1);
+        List<CourseId> courseIdList = adminDao.recentlyAddedCourseWithPagination(limit,offset,userName);
+        for (CourseId courseId : courseIdList) {
+            CourseResponse courseResponse = new CourseResponse();
+            if (courseId.isUploadStatus() == false) {
+                courseResponse = adminDao.GetCourses(userName, courseId.getCourseId());
+                courseResponse.setUploadedStatus(false);
+                courseResponseList.add(courseResponse);
+                continue;
+             }
+            courseResponse = adminDao.GetCourses(userName, courseId.getCourseId());
+            courseResponse.setUploadedStatus(true);
+            courseResponseList.add(courseResponse);
+        }
+        return courseResponseList;
+
     }
 }
 

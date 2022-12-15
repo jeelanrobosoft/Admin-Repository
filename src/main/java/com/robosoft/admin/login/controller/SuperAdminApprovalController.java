@@ -1,5 +1,6 @@
 package com.robosoft.admin.login.controller;
 
+import com.aspose.pdf.Operator;
 import com.robosoft.admin.login.model.Admin;
 import com.robosoft.admin.login.model.Register;
 import com.robosoft.admin.login.service.SuperAdminRequestHandler;
@@ -45,6 +46,14 @@ public class SuperAdminApprovalController {
     @GetMapping("/admins")
     public ResponseEntity<?> getApprovalPendingAdminDetails(){
        return new ResponseEntity<>(superAdminRequestHandler.getAdminDetails(),HttpStatus.OK);
+    }
+
+    @GetMapping("/rejected/admins")
+    public ResponseEntity<?> getDeletedAdminsList(){
+        List<Register> rejectedList = superAdminRequestHandler.getDeletedAdminDetails();
+        if(rejectedList.isEmpty())
+            return new ResponseEntity<>(Collections.singletonMap("message","Not found"),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(rejectedList,HttpStatus.OK);
     }
 
 

@@ -1,6 +1,7 @@
 package com.robosoft.admin.login.dao;
 
 import com.robosoft.admin.login.dto.*;
+import com.robosoft.admin.login.model.CourseId;
 import com.robosoft.admin.login.model.Enrollment;
 import com.robosoft.admin.login.model.Register;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,10 @@ public class AdminDao {
             StudentList studentList = new StudentList();
             try {
                 if (enrollment.getSubscribeStatus()) {
-                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,enrollment.courseId,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
                     studentLists.add(studentList);
                 } else {
-                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ? and enrollment.deleteStatus = false", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
+                    studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,enrollment.courseId,courseName,completedDate,courseCompletedStatus,enrollment.subscribeStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ? and enrollment.deleteStatus = false", new BeanPropertyRowMapper<>(StudentList.class), enrollment.getCourseId(), enrollment.getUserName());
                     studentLists.add(studentList);
                 }
             }
@@ -165,6 +166,19 @@ public class AdminDao {
     public void editQuestion(QuestionRequest questionRequest) {
         jdbcTemplate.update("UPDATE question SET questionName = ?,option_1 = ?,option_2 = ?, option_3 = ?,option_4 = ?, correctAnswer = ? WHERE questionId = ?",
                 questionRequest.getQuestionName(),questionRequest.getOption_1(),questionRequest.getOption_2(),questionRequest.getOption_3(),questionRequest.getOption_4(),questionRequest.getCorrectAnswer(),questionRequest.getQuestionId());
+    }
+
+
+    public List<CourseId> recentlyAddedCourseWithoutPagination(String userName) {
+        return jdbcTemplate.query("select distinct(chapter.courseId),uploadStatus from chapter inner join course on course.courseId=chapter.courseId where adminId=?", new BeanPropertyRowMapper<>(CourseId.class),userName);
+    }
+
+    public CourseResponse GetCourses(String userName,Integer courseId) {
+        return jdbcTemplate.queryForObject("select courseId,courseName,coursePhoto,previewVideo,uploadedDate from course where adminId=? and courseId=?",new BeanPropertyRowMapper<>(CourseResponse.class),userName,courseId);
+    }
+
+    public List<CourseId> recentlyAddedCourseWithPagination(long limit, long offset, String userName) {
+        return jdbcTemplate.query("select distinct(chapter.courseId),uploadStatus from chapter inner join course on course.courseId=chapter.courseId where adminId=? limit ?,?", new BeanPropertyRowMapper<>(CourseId.class), userName, offset, limit);
     }
 
     public void deleteQuestion(QuestionRequest questionRequest) {

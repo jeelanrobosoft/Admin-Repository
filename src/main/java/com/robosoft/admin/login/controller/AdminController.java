@@ -1,9 +1,6 @@
 package com.robosoft.admin.login.controller;
 
-import com.robosoft.admin.login.dto.ChapterListResponse;
-import com.robosoft.admin.login.dto.StudentList;
-import com.robosoft.admin.login.dto.StudentStatusRequest;
-import com.robosoft.admin.login.dto.TestRequest;
+import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import com.robosoft.admin.login.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +27,6 @@ public class AdminController {
         return new ResponseEntity<>(Collections.singletonMap("message", "Something Went Wrong"), HttpStatus.OK);
     }
 
-    @GetMapping("/studentList")
-    public ResponseEntity<?> getStudentList(@RequestParam int pageNumber, @RequestParam int limit) {
-        try {
-            List<StudentList> studentLists = adminService.getStudentList(pageNumber, limit);
-            if (studentLists.isEmpty())
-                return new ResponseEntity<>(Collections.singletonMap("message", "null"), HttpStatus.OK);
-            return new ResponseEntity<>(studentLists, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(Collections.singletonMap("Error", "Something Went Wrong"), HttpStatus.NOT_FOUND);
-        }
-    }
 
     @GetMapping("/studentListWithoutPage")
     public ResponseEntity<?> getStudentListWithoutPagination() {
@@ -104,4 +89,33 @@ public class AdminController {
             return new ResponseEntity<>(testRequest,HttpStatus.OK);
         return new ResponseEntity<>(Collections.singletonMap("message","null"),HttpStatus.OK);
     }
+
+    @GetMapping("/coursesAddedWP")
+    public ResponseEntity<?> getRecentlyAddedCourseWP(){
+        List<CourseResponse> responses = adminService.recentlyAddedCourseWithoutPagination();
+        if(responses.isEmpty())
+            return new ResponseEntity<>(Collections.singletonMap("message","No course is present"),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(responses,HttpStatus.OK);
+    }
+    @GetMapping("/studentList")
+    public ResponseEntity<?> getStudentList(@RequestParam int pageNumber, @RequestParam int limit) {
+        try {
+            List<StudentList> studentLists = adminService.getStudentList(pageNumber, limit);
+            if (studentLists.isEmpty())
+                return new ResponseEntity<>(Collections.singletonMap("message", "null"), HttpStatus.OK);
+            return new ResponseEntity<>(studentLists, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(Collections.singletonMap("Error", "Something Went Wrong"), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/coursesAdded")
+    public ResponseEntity<?> getRecentlyAddedCourse(@RequestParam int pageNumber, @RequestParam int limit){
+        List<CourseResponse> responses = adminService.getCoursesAdded(pageNumber,limit);
+        if(responses.isEmpty())
+            return new ResponseEntity<>(Collections.singletonMap("message","No course is present"),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(responses,HttpStatus.OK);
+
+    }
+
 }
