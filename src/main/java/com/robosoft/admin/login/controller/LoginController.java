@@ -1,7 +1,6 @@
 package com.robosoft.admin.login.controller;
 
 
-import com.robosoft.admin.login.dto.JwtResponse;
 import com.robosoft.admin.login.model.*;
 import com.robosoft.admin.login.service.LoginService;
 import com.robosoft.admin.login.service.MyUserDetailsService;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,7 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"},exposedHeaders = {"jwt-token","refreshToken"})
 public class LoginController {
 
 
@@ -59,11 +57,11 @@ public class LoginController {
         final String token = jwtUtility.generateToken(userDetails);
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
         String authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Jwt-token", token);
         LoginStatus loginStatus = new LoginStatus();
         loginStatus.setStatus("login successfully");
         loginStatus.setRole(authorities);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("jwt-token",token);
         return ResponseEntity.ok().headers(headers).body(loginStatus);
     }
 

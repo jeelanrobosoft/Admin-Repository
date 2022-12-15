@@ -2,11 +2,12 @@ package com.robosoft.admin.login;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.*;
 
 @SpringBootApplication
+@EnableScheduling
 @EnableWebMvc
 public class Application extends WebMvcConfigurerAdapter {
 
@@ -20,8 +21,8 @@ public class Application extends WebMvcConfigurerAdapter {
 	}
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/***").allowedOrigins("http://localhost:3000").allowedHeaders("*").allowedMethods("GET","PUT","POST")
-				.exposedHeaders("jwt-token","refreshToken");
+		registry.addMapping("/***").allowedOrigins("http://localhost:3000","http://localhost:4200").allowedHeaders("*").allowedMethods("GET","PUT","POST");
+				//.exposedHeaders("jwt-token","refreshToken");
 	}
 
 
