@@ -79,7 +79,10 @@ public class AdminService {
             try {
                 editTest(testRequest);
                 return "Test Updated SuccessFully";
-            } catch (Exception e) {
+
+            catch (Exception e)
+            {
+                e.printStackTrace();
                 return "Failed";
             }
 
@@ -127,7 +130,24 @@ public class AdminService {
             return "Failed to Subscribe";
         }
     }
+    
+        public void editTest(TestRequest testRequest){
+            adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
+            for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
+                if(questionRequest.getQuestionId() != null) {
+                    if(questionRequest.isDeleteStatus() == true)
+                    {
+                        adminDao.deleteQuestion(questionRequest);
+                    }
+                    else
+                    {
+                        adminDao.editQuestion(questionRequest);
+                    }
+                }
+           }
+        }
 
+           
     public DashBoardHeaderResponse getDashBoardHeader() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
@@ -148,15 +168,6 @@ public class AdminService {
         }
     }
 
-    public void editTest(TestRequest testRequest) {
-        adminDao.editTest(testRequest.getTestId(), testRequest.getTestName(), testRequest.getTestDuration(), testRequest.getChapterId(), testRequest.getPassingGrade());
-        for (QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
-            if (questionRequest.getQuestionId() != null)
-                adminDao.editQuestion(questionRequest);
-            else
-                adminDao.addQuestions(questionRequest, testRequest.getTestId());
-        }
-    }
 
     public List<CourseResponse> recentlyAddedCourseWithoutPagination() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -198,7 +209,7 @@ public class AdminService {
                 courseResponse.setUploadedStatus(false);
                 courseResponseList.add(courseResponse);
                 continue;
-            }
+             }
             courseResponse = adminDao.GetCourses(userName, courseId.getCourseId());
             courseResponse.setUploadedStatus(true);
             courseResponseList.add(courseResponse);

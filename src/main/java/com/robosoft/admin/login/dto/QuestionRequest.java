@@ -15,4 +15,5 @@ public class QuestionRequest {
     private String option_3;
     private String option_4;
     private String correctAnswer;
+    private boolean deleteStatus = false;
 }
