@@ -89,6 +89,7 @@ public class AdminService {
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 return "Failed";
             }
 
@@ -163,10 +164,16 @@ public class AdminService {
     public void editTest(TestRequest testRequest){
             adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
             for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
-                if(questionRequest.getQuestionId() != null)
-                    adminDao.editQuestion(questionRequest);
-                else
-                    adminDao.addQuestions(questionRequest,testRequest.getTestId());
+                if(questionRequest.getQuestionId() != null) {
+                    if(questionRequest.isDeleteStatus() == true)
+                    {
+                        adminDao.deleteQuestion(questionRequest);
+                    }
+                    else
+                    {
+                        adminDao.editQuestion(questionRequest);
+                    }
+                }
             }
     }
 }

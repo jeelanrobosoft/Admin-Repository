@@ -159,11 +159,15 @@ public class AdminDao {
     }
 
     public void editTest(Integer testId, String testName, String testDuration, Integer chapterId, Integer passingGrade) {
-        jdbcTemplate.update("UPDATE test SET testName = ?,testDuration = ?,chapterId = ? passingGrade = ? WHERE testId = ?",testName,testDuration,chapterId,passingGrade,testId);
+        jdbcTemplate.update("UPDATE test SET testName = ?,testDuration = ?,chapterId = ?, passingGrade = ? WHERE testId = ?",testName,testDuration,chapterId,passingGrade,testId);
     }
 
     public void editQuestion(QuestionRequest questionRequest) {
-        jdbcTemplate.update("UPDATE question SET questionName = ?,option_1 = ?,option_2 = ?, option_3 = ?,option_4 = ? correctAnswer = ? WHERE questionId = ?",
+        jdbcTemplate.update("UPDATE question SET questionName = ?,option_1 = ?,option_2 = ?, option_3 = ?,option_4 = ?, correctAnswer = ? WHERE questionId = ?",
                 questionRequest.getQuestionName(),questionRequest.getOption_1(),questionRequest.getOption_2(),questionRequest.getOption_3(),questionRequest.getOption_4(),questionRequest.getCorrectAnswer(),questionRequest.getQuestionId());
+    }
+
+    public void deleteQuestion(QuestionRequest questionRequest) {
+        jdbcTemplate.update("DELETE FROM question WHERE questionId = ?",questionRequest.getQuestionId());
     }
 }
