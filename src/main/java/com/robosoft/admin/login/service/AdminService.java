@@ -74,7 +74,7 @@ public class AdminService {
             try {
                 chapterListResponses.add(adminDao.getChapterDetails(chapterId));
             } catch (Exception e) {
-
+                continue;
             }
         }
         return chapterListResponses;
@@ -165,7 +165,7 @@ public class AdminService {
             adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
             for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
                 if(questionRequest.getQuestionId() != null) {
-                    if(questionRequest.isDeleteStatus() == true)
+                    if(questionRequest.isDeleteStatus())
                     {
                         adminDao.deleteQuestion(questionRequest);
                     }
