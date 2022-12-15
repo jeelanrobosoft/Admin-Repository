@@ -12,6 +12,6 @@ import java.util.List;
 public class AddChapterRequest {
     private Integer courseId;
     private String courseName;
-    private Integer chapterId;
+//    private Integer chapterId;
     private List<ChapterDataRequest> chapterDataRequestList;
 }

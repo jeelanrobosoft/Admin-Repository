@@ -84,7 +84,7 @@ public class AddCourseController {
     }
 
     @PostMapping("/overView")
-    public ResponseEntity<?> addOverView(@ModelAttribute AddCourseRequest addCourseRequest) throws IOException {
+    public ResponseEntity<?> addOverView(@RequestBody AddCourseRequest addCourseRequest) throws IOException {
         String response = overViewData.addCourseOverView(addCourseRequest);
         if(response.equals("Overview added"))
         {
@@ -96,7 +96,8 @@ public class AddCourseController {
     @PostMapping("/chapter")
     public ResponseEntity<?> addChapter(@RequestBody AddChapterRequest addCourseRequest) throws ParseException {
           String response = overViewData.addChapter(addCourseRequest);
-          if(response.equals("Chapter Data added"))
+        System.out.println("response "+response);
+          if(response.equals("Chapter Data Added") || response.equals("Chapter Data Updated"))
           {
               return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
           }
