@@ -68,7 +68,7 @@ public class AdminService {
             try {
                 chapterListResponses.add(adminDao.getChapterDetails(chapterId));
             } catch (Exception e) {
-
+                continue;
             }
         }
         return chapterListResponses;
@@ -130,7 +130,7 @@ public class AdminService {
             return "Failed to Subscribe";
         }
     }
-    
+
         public void editTest(TestRequest testRequest){
             adminDao.editTest(testRequest.getTestId(),testRequest.getTestName(),testRequest.getTestDuration(),testRequest.getChapterId(),testRequest.getPassingGrade());
             for(QuestionRequest questionRequest : testRequest.getQuestionRequests()) {
@@ -147,7 +147,6 @@ public class AdminService {
            }
         }
 
-           
     public DashBoardHeaderResponse getDashBoardHeader() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Integer totalStudentsEnrolled = adminDao.getTotalStudentsEnrolled(userName);
