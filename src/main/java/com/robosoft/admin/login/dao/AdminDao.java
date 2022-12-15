@@ -178,11 +178,10 @@ public class AdminDao {
     }
 
     public List<CourseId> recentlyAddedCourseWithPagination(long limit, long offset, String userName) {
-        return jdbcTemplate.query("select distinct(chapter.courseId),uploadStatus from chapter inner join course on course.courseId=chapter.courseId where adminId=? limit ?,?", new BeanPropertyRowMapper<>(CourseId.class),userName,offset,limit);
-
+        return jdbcTemplate.query("select distinct(chapter.courseId),uploadStatus from chapter inner join course on course.courseId=chapter.courseId where adminId=? limit ?,?", new BeanPropertyRowMapper<>(CourseId.class), userName, offset, limit);
+    }
 
     public void deleteQuestion(QuestionRequest questionRequest) {
         jdbcTemplate.update("DELETE FROM question WHERE questionId = ?",questionRequest.getQuestionId());
-
     }
 }
