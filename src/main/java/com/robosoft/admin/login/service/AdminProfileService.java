@@ -22,11 +22,8 @@ public class AdminProfileService {
     public Profile getProfile()
     {
         String adminId = SecurityContextHolder.getContext().getAuthentication().getName();
-//        adminId="akjeelan22@gmail.com";
         return adminProfileDataAccess.getProfile(adminId);
-
     }
-
     public String saveProfileDetails(ProfileDetails details) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         String profilePhoto = null;
@@ -35,6 +32,7 @@ public class AdminProfileService {
         Integer status = checkStringContainsNumberOrNot(details.getFullName());
         if (status == -1)
             return "FullName name cannot be empty";
+
         if (status == 1)
             return "FullName should not contain digits";
         if(!(details.getFullName().length()>=5))

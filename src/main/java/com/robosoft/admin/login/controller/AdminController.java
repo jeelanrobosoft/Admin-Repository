@@ -115,7 +115,12 @@ public class AdminController {
         if(responses.isEmpty())
             return new ResponseEntity<>(Collections.singletonMap("message","No course is present"),HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(responses,HttpStatus.OK);
+    }
 
+    @GetMapping("/CourseDetails")
+    public ResponseEntity<?> getCourseDetails(@RequestParam int courseId){
+        adminService.getCourseDetails(courseId);
+        return null;
     }
 
 }
