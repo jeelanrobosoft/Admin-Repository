@@ -1,6 +1,7 @@
 package com.robosoft.admin.login.dao;
 
 import com.robosoft.admin.login.model.Admin;
+import com.robosoft.admin.login.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -11,9 +12,9 @@ public class AdminProfileDataAccess {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public Admin getProfile(String adminId)
+    public Profile getProfile(String adminId)
     {
-         return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto,approvalStatus FROM admin WHERE emailId=?",new BeanPropertyRowMapper<>(Admin.class),adminId);
+        return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto FROM admin WHERE emailId=?",new BeanPropertyRowMapper<>(Profile.class),adminId);
     }
 
     public void saveDetails(String userName,String fullName, String profilePhoto, String mobileNumber) {

@@ -216,6 +216,15 @@ public class AdminService {
         return courseResponseList;
 
     }
+
+    public Object getCourseDetails(int courseId) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Integer status = adminDao.checkForCourseDetails(userName,courseId);
+        if(status == 0)
+            return null;
+
+        return null;
+    }
 }
 
 

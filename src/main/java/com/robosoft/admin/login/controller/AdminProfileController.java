@@ -1,6 +1,7 @@
 package com.robosoft.admin.login.controller;
 
 import com.robosoft.admin.login.model.Admin;
+import com.robosoft.admin.login.model.Profile;
 import com.robosoft.admin.login.model.ProfileDetails;
 import com.robosoft.admin.login.service.AdminProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,10 @@ public class AdminProfileController {
     @GetMapping("/getProfile")
     public ResponseEntity<?> getProfile()
     {
-        Admin admin = adminProfileService.getProfile();
-        if(admin != null)
+        Profile profile = adminProfileService.getProfile();
+        if(profile != null)
         {
-            return ResponseEntity.of(Optional.of(admin));
+            return ResponseEntity.of(Optional.of(profile));
         }
         return new ResponseEntity<>(Collections.singletonMap("message", "Invalid Credentials"), HttpStatus.OK);
     }

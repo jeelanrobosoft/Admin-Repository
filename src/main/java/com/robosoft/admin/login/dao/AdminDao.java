@@ -184,4 +184,8 @@ public class AdminDao {
     public void deleteQuestion(QuestionRequest questionRequest) {
         jdbcTemplate.update("DELETE FROM question WHERE questionId = ?",questionRequest.getQuestionId());
     }
+
+    public Integer checkForCourseDetails(String userName, int courseId) {
+        return jdbcTemplate.queryForObject("select count(*) from course where courseId=? and adminId=?", Integer.class,courseId,userName);
+    }
 }
