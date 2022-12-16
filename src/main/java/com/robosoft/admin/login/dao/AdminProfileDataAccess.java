@@ -14,11 +14,8 @@ public class AdminProfileDataAccess {
 
     public Profile getProfile(String adminId)
     {
-<<<<<<< HEAD
          return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto FROM admin WHERE emailId=?",new BeanPropertyRowMapper<>(Profile.class),adminId);
-=======
-        return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto FROM admin WHERE emailId=?",new BeanPropertyRowMapper<>(Profile.class),adminId);
->>>>>>> ab2d0f263e1936c11151d15dc6994059c3c659f7
+
     }
 
     public void saveDetails(String userName,String fullName, String profilePhoto, String mobileNumber) {
