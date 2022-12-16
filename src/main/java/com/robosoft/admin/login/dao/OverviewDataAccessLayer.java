@@ -76,7 +76,7 @@ public class OverviewDataAccessLayer {
         boolean status = true;
         String keywords[] = keyword.split(",");
         List<CourseKeywords> keywordsList = jdbcTemplate.query("SELECT * FROM courseKeywords",new BeanPropertyRowMapper<>(CourseKeywords.class));
-        System.out.println(keywordsList);
+
         for(String keywordData: keywords)
         {
             if(keywordData.matches(".*\\d.*"))
@@ -85,7 +85,7 @@ public class OverviewDataAccessLayer {
             }
             status = true;
             jdbcTemplate.update("DELETE FROM courseKeywords WHERE courseId = ?", courseId);
-            System.out.println("deleted");
+
             for(CourseKeywords courseKeyword: keywordsList)
             {
                 if(courseKeyword.getKeyword().equalsIgnoreCase(keywordData))
@@ -169,11 +169,11 @@ public class OverviewDataAccessLayer {
         jdbcTemplate.update("UPDATE course SET uploadedDate = ? WHERE courseId = ?",now,courseId);
     }
     public void addChapter(ChapterDataRequest chapterDataRequest,Integer courseId, Integer chapterNumber) throws ParseException {
-        System.out.println("inside add chapter "+courseId);
+
         String query ="INSERT INTO chapter(courseId,chapterNumber,chapterName) values(?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String chapterName = chapterDataRequest.getChapterName();
-        System.out.println("course Id "+courseId);
+
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -227,14 +227,15 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
                lessonNumber  = jdbcTemplate.queryForObject("SELECT lessonNumber FROM lesson WHERE lessonId = ?", Integer.class, lessonDataRequest.getLessonId());
            }
        }
+        System.out.println("last lesson number "+lessonNumber);
        return lessonNumber;
     }
 
     public void enrollmentUpdate(String adminId, Integer courseId, Integer chapterId, Integer lessonId)
     {
-        System.out.println("Inside enrollment");
+
         List<Enrollment> enrollments = jdbcTemplate.queryForList("SELECT * FROM enrollment WHERE courseId = ?",Enrollment.class,chapterId);
-        System.out.println(enrollments);
+
         if(enrollments.size() > 0)
         {
         for(Enrollment enrollment: enrollments)
@@ -249,16 +250,18 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
                 {
                     jdbcTemplate.update("INSERT INTO lessonProgress(userName,chapterId,lessonId) values(?,?,?)",enrollment.getUserName(),chapterIdData,lessonIdData);
                 }
-                System.out.println("Status updation "+lessonIds.get(0));
+
                 jdbcTemplate.update("UPDATE lessonStatus = true WHERE lessonId = ?",lessonIds.get(0));
             }
         }
         }
     }
     public void includeLesson(Integer courseId, ChapterDataRequest chapterDataRequest, String adminId, Integer chapterId) throws ParseException {
-        System.out.println("include lesson"+chapterDataRequest);
+
         List<LessonDataRequest> lessonsList = chapterDataRequest.getLessonsList();
         Integer lessonNumber = getLastLessonNumber(chapterDataRequest.getLessonsList(),chapterId);
+        System.out.println("lesson number is :::::"+lessonNumber);
+
         for(LessonDataRequest lesson: lessonsList)
         {
             if(lesson.getLessonId() == null)
@@ -266,11 +269,11 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
                 String lessonName = lesson.getLessonName();
                 String lessonDuration = lesson.getLessonDuration();
                 String videoLink = lesson.getVideoLink();
-                Integer finalLessonNumber = lessonNumber;
+                Integer finalLessonNumber = lessonNumber+1;
                 String query = "INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration,videoLink) values(?,?,?,?,?)";
                 KeyHolder keyHolder = new GeneratedKeyHolder();
                 String chapterName = chapterDataRequest.getChapterName();
-                System.out.println("course Id "+courseId);
+
                 jdbcTemplate.update(connection -> {
                     PreparedStatement ps = connection
                             .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -283,6 +286,7 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
                 }, keyHolder);
                 Integer lessonId = Integer.parseInt(keyHolder.getKey().toString());
                 ++lessonNumber;
+
                 updateChapterDuration(chapterId,lesson.getLessonDuration());
                 enrollmentUpdate(adminId,courseId, chapterId,lessonId);
             }
@@ -383,6 +387,7 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             }
             jdbcTemplate.update("INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration,videoLink) values(?,?,?,?,?)",lessonNumber,chapterId,lesson.getLessonName(), lesson.getLessonDuration(), lesson.getVideoLink());
             ++lessonNumber;
+            System.out.println("Lesson number "+lessonNumber);
             updateChapterDuration(chapterId,lesson.getLessonDuration());
         }
         if(uploadStatus == true)

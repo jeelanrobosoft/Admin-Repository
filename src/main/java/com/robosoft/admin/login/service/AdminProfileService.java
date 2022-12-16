@@ -19,6 +19,5 @@ public class AdminProfileService {
     {
         String adminId = SecurityContextHolder.getContext().getAuthentication().getName();
         return adminProfileDataAccess.getProfile(adminId);
-
     }
 }

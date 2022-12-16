@@ -20,7 +20,6 @@ public class OverViewData {
     @Autowired
     private OverviewDataAccessLayer overviewDataAccessLayer;
     public String addCourseOverView(AddCourseRequest addCourseRequest) throws IOException {
-        System.out.println(addCourseRequest);
         String adminId = SecurityContextHolder.getContext().getAuthentication().getName();
         String keywords[] = addCourseRequest.getCourseKeyword().split(",");
         for(String keyword: keywords)
@@ -32,18 +31,15 @@ public class OverViewData {
         }
 
         Integer courseIdData = overviewDataAccessLayer.getCourseId(addCourseRequest.getCourseId());
-        System.out.println("CourseIdData "+courseIdData);
         if(courseIdData == null)
         {
             String courseId =overviewDataAccessLayer.addCourse(addCourseRequest,adminId);
              CourseIdentifier = Integer.parseInt(courseId);
             overviewDataAccessLayer. addOverView(addCourseRequest,Integer.parseInt(courseId));
-            System.out.println("overview data ="+CourseIdentifier);
             return "Overview added";
         }
        else
        {
-           System.out.println("else");
          overviewDataAccessLayer.updateCourse(addCourseRequest);
          overviewDataAccessLayer.updateOverView(addCourseRequest);
          return "Overview updated";
@@ -51,18 +47,17 @@ public class OverViewData {
     }
    public String addChapter(AddChapterRequest addCourseRequest) throws ParseException {
        String adminId = SecurityContextHolder.getContext().getAuthentication().getName();
-       System.out.println("chapter data "+CourseIdentifier);
        Integer courseId = overviewDataAccessLayer.getCourseId(addCourseRequest.getCourseId());
        List<ChapterDataRequest> chapterDataRequestList = addCourseRequest.getChapterDataRequestList();
        Integer chapterNumber = 1;
-       System.out.println("course Id data "+CourseIdentifier);
        if(courseId == null || courseId ==0)
        {
            for(ChapterDataRequest chapter: chapterDataRequestList)
            {
-               System.out.println("Course identifier "+CourseIdentifier);
+
                overviewDataAccessLayer.addChapter(chapter,CourseIdentifier,chapterNumber);
                ++chapterNumber;
+
            }
            overviewDataAccessLayer.updateCourseDuration(CourseIdentifier);
            return "Chapter Data Added";
@@ -70,7 +65,6 @@ public class OverViewData {
        else
        {
            chapterNumber = overviewDataAccessLayer.getLastChapterNumber(chapterDataRequestList);
-           System.out.println("Last chapter number "+chapterNumber);
            for(ChapterDataRequest chapter: chapterDataRequestList)
            {
 
@@ -80,8 +74,10 @@ public class OverViewData {
                }
                else
                {
-                   System.out.println("NEW CHAPTER");
-                    overviewDataAccessLayer.includeChapter(chapter,addCourseRequest.getCourseId(),chapterNumber, adminId);
+                   System.out.println("chapter number before"+chapterNumber);
+                    overviewDataAccessLayer.includeChapter(chapter,addCourseRequest.getCourseId(),++chapterNumber, adminId);
+                    ++chapterNumber;
+
                }
            }
            overviewDataAccessLayer.updateCourseDuration(courseId);
