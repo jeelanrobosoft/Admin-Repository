@@ -184,4 +184,16 @@ public class AdminDao {
     public void deleteQuestion(QuestionRequest questionRequest) {
         jdbcTemplate.update("DELETE FROM question WHERE questionId = ?",questionRequest.getQuestionId());
     }
+
+    public List<String> getEnrolledUserNames(Integer chapterId) {
+        return jdbcTemplate.queryForList("SELECT DISTINCT userName FROM chapterProgress WHERE chapterId = ?", String.class,chapterId);
+    }
+
+    public boolean hasChapterCompleted(String userName, Integer chapterId) {
+        return jdbcTemplate.queryForObject("SELECT chapterCompletedStatus FROM chapterProgress WHERE userName = ? AND chapterId = ?", Boolean.class,userName,chapterId);
+    }
+
+    public void addTestForEnrolled(Integer testId, String userName, Integer chapterId) {
+        jdbcTemplate.update("UPDATE chapterProgress SET testId = ? WHERE userName = ? AND chapterId = ?",userName,chapterId);
+    }
 }
