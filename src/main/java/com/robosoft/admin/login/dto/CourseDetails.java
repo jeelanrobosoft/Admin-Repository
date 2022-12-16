@@ -2,6 +2,7 @@ package com.robosoft.admin.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.robosoft.admin.login.model.Chapter;
+import com.robosoft.admin.login.model.Lesson;
 import com.robosoft.admin.login.model.Overview;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class CourseDetails {
     private String subCategoryName;
     private Overview overview;
     private Chapter chapter;
+    private Lesson lesson;
 
 
 }
