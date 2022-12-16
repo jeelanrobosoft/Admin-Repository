@@ -2,7 +2,7 @@ package com.robosoft.admin.login.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.robosoft.admin.login.dao.RegisterDao;
+import com.robosoft.admin.login.dao.AdminDao;
 import com.robosoft.admin.login.model.Register;
 import com.robosoft.admin.login.model.ResetPassword;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class RegisterService {
 
     @Autowired
-    RegisterDao registerDao;
+    AdminDao adminDao;
 
 
     public String uploadProfilePhoto(MultipartFile profilePhoto)
@@ -39,9 +39,8 @@ public class RegisterService {
             );
             Map uploadResult = cloudinary.uploader().upload(profilePhoto.getBytes(), params1);
             //String publicId = uploadResult.get("public_id").toString();
-            String url = uploadResult.get("secure_url").toString();
 
-            return url;
+            return uploadResult.get("secure_url").toString();
         }
         catch (Exception e)
         {
@@ -59,11 +58,13 @@ public class RegisterService {
         {
             return "Invalid EmailId";
         }
-        if(!register.getProfilePhoto().isEmpty())
-        {
-           url = uploadProfilePhoto(register.getProfilePhoto());
-        }
-        Pattern ptrn = Pattern.compile("\\d{10}");
+
+//        if(register.getProfilePhoto() != null)
+//        {
+////           url = uploadProfilePhoto(register.getProfilePhoto());
+//        }
+        Pattern ptrn = Pattern.compile("^\\+(?:[0-9] ?){6,14}[0-9]$");
+
 
         Matcher phMatcher = ptrn.matcher(register.getMobileNumber());
         if(!phMatcher.matches())
@@ -71,25 +72,32 @@ public class RegisterService {
             return "Invalid Mobile Number";
         }
         try {
-            registerDao.adminRegister(register,url);
-            return "Registration Request Sent You Will Receive the Mail ASAP.";
+            register.getEmailId().matches(adminDao.getAdminEmailId(register.getEmailId()));
+            if(!adminDao.getAdminApprovalStatus(register.getEmailId())) {
+                adminDao.updateRegistration(register,url);
+            }
+            return "Email Id already Exists";
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return "Registration Failed";
+        catch (Exception exception) {
+            try {
+                adminDao.adminRegister(register, url);
+                return "Registration Request Sent You Will Receive the Mail ASAP.";
+            } catch (Exception e) {
+                return "Registration Failed";
+            }
         }
     }
 
     public String resetPassword(ResetPassword resetPassword) {
         try {
-            String emailId = registerDao.getAdminEmailId(resetPassword.getEmailId());
+            String emailId = adminDao.getAdminEmailId(resetPassword.getEmailId());
             if(emailId != null)
-                registerDao.resetPassword(emailId,new BCryptPasswordEncoder().encode(resetPassword.getPassword()));
+                adminDao.resetPassword(emailId,new BCryptPasswordEncoder().encode(resetPassword.getPassword()));
             return "Password Updated Successfully.";
         }
         catch (Exception exception)
         {
+            exception.printStackTrace();
             return "Invalid Email Id";
         }
     }

@@ -27,9 +27,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
 
-    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/resend" ,"/admin/verify","/admin/login","/admin/dummy","/superAdmin/approve", "/superAdmin/reject","/admin/register","/admin/refreshToken","admin/resetPassword","/addCourse/overView","/addCourse/chapter","/admin/getProfile"};
- 
-
+    private static final String[] BASE_URL = {"/admin/login","/admin/resetPassword","/admin/send","/admin/resend" ,"/admin/verify","/admin/register","/admin/dummy"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -38,7 +36,8 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .antMatchers(BASE_URL).permitAll()
-                .antMatchers("/admin/***").hasAnyRole("ADMIN","SUPER_ADMIN")
+                .antMatchers("/admin/***").hasRole("ADMIN")
+                .antMatchers("/superAdmin/**").hasRole("SUPER_ADMIN")
                 .anyRequest().authenticated()
                 .and().exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
