@@ -185,7 +185,18 @@ public class AdminDao {
         jdbcTemplate.update("DELETE FROM question WHERE questionId = ?",questionRequest.getQuestionId());
     }
 
-    public Integer checkForCourseDetails(String userName, int courseId) {
+    public List<String> getEnrolledUserNames(Integer chapterId) {
+        return jdbcTemplate.queryForList("SELECT DISTINCT userName FROM chapterProgress WHERE chapterId = ?", String.class,chapterId);
+    }
+
+    public boolean hasChapterCompleted(String userName, Integer chapterId) {
+        return jdbcTemplate.queryForObject("SELECT chapterCompletedStatus FROM chapterProgress WHERE userName = ? AND chapterId = ?", Boolean.class,userName,chapterId);
+    }
+
+    public void addTestForEnrolled(Integer testId, String userName, Integer chapterId) {
+        jdbcTemplate.update("UPDATE chapterProgress SET testId = ? WHERE userName = ? AND chapterId = ?",userName,chapterId);
+    }
+        public Integer checkForCourseDetails(String userName, int courseId) {
         return jdbcTemplate.queryForObject("select count(*) from course where courseId=? and adminId=?", Integer.class,courseId,userName);
     }
 }
