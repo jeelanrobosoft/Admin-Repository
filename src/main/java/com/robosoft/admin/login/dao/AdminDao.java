@@ -44,8 +44,9 @@ public class AdminDao {
 
     public List<StudentList> getStudentList(String emailId, long pageNumber, long pageLimit) {
         List<StudentList> studentLists = new ArrayList<>();
-        List<Enrollment> enrollments = jdbcTemplate.query("SELECT * from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? limit ?,?", new BeanPropertyRowMapper<>(Enrollment.class),emailId,pageNumber,pageLimit);
+        List<Enrollment> enrollments = jdbcTemplate.query("SELECT userName,enrollment.courseId,deleteStatus,subscribeStatus from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? AND ((subscribeStatus = true AND deleteStatus = true) OR deleteStatus = false) limit ?,? ", new BeanPropertyRowMapper<>(Enrollment.class),emailId,pageNumber,pageLimit);
         for(Enrollment enrollment : enrollments) {
+            System.out.println(enrollment);
             StudentList studentList = new StudentList();
             try {
                 if (enrollment.getSubscribeStatus()) {
@@ -65,7 +66,7 @@ public class AdminDao {
 
     public List<StudentList> getStudentListWithoutPagination(String emailId) {
         List<StudentList> studentLists = new ArrayList<>();
-        List<Enrollment> enrollments = jdbcTemplate.query("SELECT * from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ?", new BeanPropertyRowMapper<>(Enrollment.class),emailId);
+        List<Enrollment> enrollments = jdbcTemplate.query("SELECT userName,course.courseId from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ?", new BeanPropertyRowMapper<>(Enrollment.class),emailId);
         for(Enrollment enrollment : enrollments) {
             StudentList studentList = jdbcTemplate.queryForObject("SELECT profilePhoto,user.userName,fullName,joinDate,courseName,completedDate,courseCompletedStatus FROM enrollment INNER JOIN user ON enrollment.userName = user.userName INNER JOIN course ON course.courseId = enrollment.courseId INNER JOIN courseProgress ON courseProgress.userName = enrollment.userName AND courseProgress.courseId = enrollment.courseId AND enrollment.courseId = ? and enrollment.userName = ?", new BeanPropertyRowMapper<>(StudentList.class),enrollment.getCourseId(),enrollment.getUserName());
             studentLists.add(studentList);

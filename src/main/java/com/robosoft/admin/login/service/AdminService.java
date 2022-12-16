@@ -32,7 +32,7 @@ public class AdminService {
             limit = perPageDataCount;
 
         list.add(limit);
-        list.add(limit * (pageNumber - 1));
+        list.add((long)limit * (pageNumber - 1));
         return list;
     }
 
@@ -196,8 +196,8 @@ public class AdminService {
     public List<StudentList> getStudentList(int pageNumber, int pageLimit) {
         String emailId = SecurityContextHolder.getContext().getAuthentication().getName();
         List<Long> list = this.getOffsetUsingCustomLimit(pageNumber, pageLimit);
-        long limit = list.get(0);
-        long offset = list.get(1);
+        long limit = Long.valueOf(list.get(0));
+        long offset = Long.valueOf(list.get(1));
         return adminDao.getStudentList(emailId, offset, limit);
     }
 

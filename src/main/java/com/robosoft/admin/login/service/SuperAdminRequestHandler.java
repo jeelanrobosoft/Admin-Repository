@@ -46,11 +46,6 @@ public class SuperAdminRequestHandler {
         email.setText("Hello "+admin.getFullName()+".\n"+" Your request for Virtual Learn admin role has been REJECTED...");
        if(response == 1)
        {
-           SimpleMailMessage email = new SimpleMailMessage();
-           email.setFrom("virtuallearn2022@gmail.com");
-           email.setTo(admin.getEmailId());
-           email.setSubject("Virtual Learn");
-           email.setText("Hello "+admin.getFullName()+".\n"+" Your request for Virtual Learn admin role has been REJECTED...\n Try again......");
            javaMailSender.send(email);
            return "Rejected";
        }
