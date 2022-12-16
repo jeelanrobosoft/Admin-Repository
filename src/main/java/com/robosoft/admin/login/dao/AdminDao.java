@@ -196,4 +196,7 @@ public class AdminDao {
     public void addTestForEnrolled(Integer testId, String userName, Integer chapterId) {
         jdbcTemplate.update("UPDATE chapterProgress SET testId = ? WHERE userName = ? AND chapterId = ?",userName,chapterId);
     }
+        public Integer checkForCourseDetails(String userName, int courseId) {
+        return jdbcTemplate.queryForObject("select count(*) from course where courseId=? and adminId=?", Integer.class,courseId,userName);
+    }
 }
