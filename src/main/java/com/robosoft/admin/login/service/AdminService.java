@@ -4,6 +4,7 @@ import com.robosoft.admin.login.dao.AdminDao;
 import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import com.robosoft.admin.login.model.CourseId;
+import com.robosoft.admin.login.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -230,8 +231,17 @@ public class AdminService {
         Integer status = adminDao.checkForCourseDetails(userName,courseId);
         if(status == 0)
             return null;
+        CourseDetails courseDetails =  adminDao.getCourseOverview(userName,courseId);
+        List<ChapterResponse> chapterList = adminDao.getTotalChapters(courseId);
+        for(ChapterResponse chapterResponse : chapterList){
+            List<Lesson> lessonList = adminDao.getLessonDetails(chapterResponse.getChapterId());
+            chapterResponse.setLessonList(lessonList);
+        }
+        List<CourseKeywords> courseKeywords = adminDao.getCourseKeywords(courseId);
+        courseDetails.setChapter(chapterList);
+        courseDetails.setKeywords(courseKeywords);
 
-        return null;
+        return courseDetails;
     }
 }
 

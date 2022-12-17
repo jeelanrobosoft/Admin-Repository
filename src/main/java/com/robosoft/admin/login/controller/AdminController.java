@@ -117,10 +117,10 @@ public class AdminController {
         return new ResponseEntity<>(responses,HttpStatus.OK);
     }
 
-    @GetMapping("/CourseDetails")
-    public ResponseEntity<?> getCourseDetails(@RequestParam int courseId){
-        adminService.getCourseDetails(courseId);
-        return null;
+    @GetMapping("/courseDetails")
+    public Object getCourseDetails(@RequestParam int courseId){
+        return adminService.getCourseDetails(courseId);
+//        return null;
     }
 
 }

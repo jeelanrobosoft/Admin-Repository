@@ -3,6 +3,7 @@ package com.robosoft.admin.login.dao;
 import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.CourseId;
 import com.robosoft.admin.login.model.Enrollment;
+import com.robosoft.admin.login.model.Lesson;
 import com.robosoft.admin.login.model.Register;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -129,7 +130,6 @@ public class AdminDao {
 
     }
 
-
     public Boolean getAdminApprovalStatus(String emailId) {
         return jdbcTemplate.queryForObject("SELECT approvalStatus FROM admin WHERE emailId = ?", Boolean.class,emailId);
     }
@@ -198,5 +198,26 @@ public class AdminDao {
     }
         public Integer checkForCourseDetails(String userName, int courseId) {
         return jdbcTemplate.queryForObject("select count(*) from course where courseId=? and adminId=?", Integer.class,courseId,userName);
+    }
+
+    public CourseDetails getCourseOverview(String userName,int courseId) {
+        return jdbcTemplate.queryForObject("select course.categoryId,categoryName,categoryPhoto,subCategory.subCategoryId,subCategoryName,courseName,coursePhoto,previewVideo," +
+                "courseTagLine,description,learningOutCome,requirements,difficultyLevel from course " +
+                "inner join category on course.categoryId=category.categoryId inner join subCategory on course.subCategoryId" +
+                "=subCategory.subCategoryId inner join overView on course.courseId=overView.courseId where course.courseId=? and adminId=?",new BeanPropertyRowMapper<>(CourseDetails.class),courseId,userName);
+
+    }
+
+    public List<ChapterResponse> getTotalChapters(int courseId) {
+        return jdbcTemplate.query("select chapterId,chapterName,uploadStatus from chapter where courseId=?",new BeanPropertyRowMapper<>(ChapterResponse.class),courseId);
+
+    }
+
+    public List<Lesson> getLessonDetails(String chapterId) {
+        return jdbcTemplate.query("select lessonId,lessonName,videoLink from lesson where chapterId=?",new BeanPropertyRowMapper<>(Lesson.class),chapterId);
+    }
+
+    public List<CourseKeywords> getCourseKeywords(int courseId) {
+        return jdbcTemplate.query("select keyword from courseKeywords where courseId=?",new BeanPropertyRowMapper<>(CourseKeywords.class),courseId);
     }
 }

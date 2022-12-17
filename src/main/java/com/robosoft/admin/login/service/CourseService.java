@@ -56,6 +56,12 @@ public class CourseService {
             return "Category should not contain digits";
         String categoryPhoto = null;
         String categoryName = category.getCategoryName().trim();
+        try{
+            if(category.getCategoryPhoto().isEmpty())
+                return "Photo cannot be empty";
+        } catch (Exception e){
+            return "Photo cannot be empty";
+        }
         try {
             category.getCategoryPhoto();
             if (category.getCategoryPhoto().getContentType().startsWith("video"))
