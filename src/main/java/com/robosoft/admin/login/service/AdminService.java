@@ -226,7 +226,7 @@ public class AdminService {
 
     }
 
-    public Object getCourseDetails(int courseId) {
+    public CourseDetails getCourseDetails(int courseId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Integer status = adminDao.checkForCourseDetails(userName,courseId);
         if(status == 0)

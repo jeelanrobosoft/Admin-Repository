@@ -1,5 +1,6 @@
 package com.robosoft.admin.login.controller;
 
+import com.google.api.Http;
 import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import com.robosoft.admin.login.service.AdminService;
@@ -118,9 +119,11 @@ public class AdminController {
     }
 
     @GetMapping("/courseDetails")
-    public Object getCourseDetails(@RequestParam int courseId){
-        return adminService.getCourseDetails(courseId);
-//        return null;
+    public ResponseEntity<?> getCourseDetails(@RequestParam int courseId){
+        CourseDetails courseDetails =  adminService.getCourseDetails(courseId);
+        if(courseDetails == null)
+            return new ResponseEntity<>(Collections.singletonMap("message","Course ID not present"), HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(courseDetails,HttpStatus.OK);
     }
 
 }
