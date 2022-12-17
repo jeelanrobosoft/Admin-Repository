@@ -218,4 +218,18 @@ public class AdminDao {
     public List<CourseKeywords> getCourseKeywords(int courseId) {
         return jdbcTemplate.query("select keyword from courseKeywords where courseId=?", new BeanPropertyRowMapper<>(CourseKeywords.class), courseId);
     }
+
+    public List<CertificateDetails> getCourseCompletedDetails(String userName) {
+        String query = "select fullName,enrollment.userName,enrollment.courseId,courseName,joinDate,completedDate,courseDuration,courseScore" +
+                " from course inner join enrollment on course.courseId=enrollment.courseId " +
+                "  inner join user on (course.courseId=enrollment.courseId and enrollment.userName = user.userName)" +
+                " where adminId=? and deleteStatus=false and\n" +
+                " completedDate > '0000-00-00' and courseScore >= 0";
+        return jdbcTemplate.query(query,new BeanPropertyRowMapper<>(CertificateDetails.class),userName);
+
+    }
+
+//    public void saveCertificate(String certificateUrl) {
+//        String query = ""
+//    }
 }
