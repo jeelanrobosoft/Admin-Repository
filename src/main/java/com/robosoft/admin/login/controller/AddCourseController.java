@@ -105,14 +105,11 @@ public class AddCourseController {
     }
 
     @PutMapping("/publishToWeb")
-    public ResponseEntity<?> publishToWeb(@RequestBody Integer courseId)
+    public ResponseEntity<?> publishToWeb(@RequestParam Integer courseId)
     {
         String response = overViewData.publishToWeb(courseId);
-        if(response.equals("Course Published"))
-        {
-            return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(Collections.singletonMap("message", "Failed To Publish"), HttpStatus.NOT_MODIFIED);
+        return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
+        //return new ResponseEntity<>(Collections.singletonMap("message", "Failed To Publish"), HttpStatus.NOT_MODIFIED);
     }
 
 }
