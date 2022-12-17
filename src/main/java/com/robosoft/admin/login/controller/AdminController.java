@@ -1,8 +1,8 @@
 package com.robosoft.admin.login.controller;
 
-import com.google.api.Http;
 import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
+import com.robosoft.admin.login.model.SaveCertificate;
 import com.robosoft.admin.login.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -125,5 +125,19 @@ public class AdminController {
             return new ResponseEntity<>(Collections.singletonMap("message","Course ID not present"), HttpStatus.NOT_ACCEPTABLE);
         return new ResponseEntity<>(courseDetails,HttpStatus.OK);
     }
+
+    @GetMapping("/course/completed")
+    public ResponseEntity<?> getCourseCompletedStudents(){
+        List<CertificateDetails> certificateDetails = adminService.getCourseCompletedDetails();
+        if(certificateDetails == null)
+            return new ResponseEntity<>(Collections.singletonMap("message","No Student has completed courses"),HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(certificateDetails,HttpStatus.OK);
+    }
+
+//    @PostMapping("/course/certificate/save")
+//    public ResponseEntity<?> saveCertificateDetails(@RequestBody SaveCertificate certificate){
+//        String status = adminService.saveCertificate(certificate.getCertificateUrl());
+//
+//    }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -93,7 +94,7 @@ public class AdminService {
                 for (String userName : userNames) {
                     if (!adminDao.hasChapterCompleted(userName, testRequest.getChapterId())) {
                         try {
-                            adminDao.addTestForEnrolled(testId,userName,testRequest.getChapterId());
+                            adminDao.addTestForEnrolled(testId, userName, testRequest.getChapterId());
                             return "Test Added SuccessFully";
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -228,12 +229,12 @@ public class AdminService {
 
     public CourseDetails getCourseDetails(int courseId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        Integer status = adminDao.checkForCourseDetails(userName,courseId);
-        if(status == 0)
+        Integer status = adminDao.checkForCourseDetails(userName, courseId);
+        if (status == 0)
             return null;
-        CourseDetails courseDetails =  adminDao.getCourseOverview(userName,courseId);
+        CourseDetails courseDetails = adminDao.getCourseOverview(userName, courseId);
         List<ChapterResponse> chapterList = adminDao.getTotalChapters(courseId);
-        for(ChapterResponse chapterResponse : chapterList){
+        for (ChapterResponse chapterResponse : chapterList) {
             List<Lesson> lessonList = adminDao.getLessonDetails(chapterResponse.getChapterId());
             chapterResponse.setLessonList(lessonList);
         }
@@ -243,6 +244,29 @@ public class AdminService {
 
         return courseDetails;
     }
+
+    public List<CertificateDetails> getCourseCompletedDetails() {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<CertificateDetails> certificateDetails = adminDao.getCourseCompletedDetails(userName);
+        if (certificateDetails.isEmpty())
+            return null;
+        certificateDetails = certificateDetails.stream().map(
+                student -> {
+                    String studentUserName = student.getUserName();
+                    String certificateNumber = " Certificate Number: CER57RF9" + studentUserName + "S978" + student.getCourseId();
+                    student.setCertificateNo(certificateNumber);
+                    student.setUserName(null);
+                    return student;
+                }
+        ).collect(Collectors.toList());
+        return certificateDetails;
+
+
+    }
+
+//    public String saveCertificate(String certificateUrl) {
+//        adminDao.saveCertificate(certificateUrl);
+//    }
 }
 
 
