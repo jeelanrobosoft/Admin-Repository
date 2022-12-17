@@ -1,3 +1,4 @@
+
 package com.robosoft.admin.login.model;
 
 import lombok.AllArgsConstructor;
@@ -14,5 +15,4 @@ public class Overview {
     private String learningOutCome;
     private String requirements;
     private String instructorId;
-    private String difficultyLevel;
-}
+    private String difficultyLeve}

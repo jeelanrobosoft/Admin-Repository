@@ -74,7 +74,7 @@ public class OverViewData {
                }
                else
                {
-                   System.out.println("chapter number before"+chapterNumber);
+
                     overviewDataAccessLayer.includeChapter(chapter,addCourseRequest.getCourseId(),++chapterNumber, adminId);
                     ++chapterNumber;
 

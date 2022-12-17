@@ -9,6 +9,7 @@ import com.robosoft.admin.login.model.CourseKeywords;
 import com.robosoft.admin.login.model.Enrollment;
 import com.robosoft.admin.login.model.Lesson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -149,17 +150,21 @@ public class OverviewDataAccessLayer {
         updateUploadDate(addCourseRequest.getCourseId());
     }
 
-    public boolean updateUploadStatus(Integer chapterId)
+    public void updateUploadStatus(List<LessonDataRequest> lessonDataRequest, Integer chapterId)
     {
-        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId = ?",new BeanPropertyRowMapper<>(Lesson.class),chapterId);
-        for(Lesson lesson: lessons)
+        boolean status = true;
+
+        for(LessonDataRequest lessonDataRequest1 : lessonDataRequest)
         {
-            if(lesson.getVideoLink() == null)
+            if(lessonDataRequest1.getVideoLink() == null)
             {
-                 return false;
+               status = false;
             }
         }
-        return true;
+        if(status == true)
+        {
+            jdbcTemplate.update("UPDATE chapter SET uploadStatus = true WHERE chapterId = ?", chapterId);
+        }
     }
 
     public void updateUploadDate(Integer courseId)
@@ -184,25 +189,27 @@ public class OverviewDataAccessLayer {
         }, keyHolder);
         Integer chapterId = Integer.parseInt(keyHolder.getKey().toString());
         addLesson(chapterDataRequest,chapterId);
-        updateUploadStatus(chapterId);
+      //  updateUploadStatus(chapterDataRequest.getLessonsList());
+     updateUploadStatus(chapterDataRequest.getLessonsList(), chapterId);
         updateUploadDate(courseId);
     }
 
 
 public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId) throws ParseException {
    jdbcTemplate.update("UPDATE chapter SET chapterName = ? WHERE courseId = ? and chapterId = ?",chapterDataRequest.getChapterName(),courseId,chapterDataRequest.getChapterId());
-   updateLesson(chapterDataRequest,chapterDataRequest.getChapterId());
-    updateUploadStatus(chapterDataRequest.getChapterId());
+   updateLesson(chapterDataRequest,chapterDataRequest.getChapterId(), courseId);
+   // updateUploadStatus(chapterDataRequest.getLessonsList());
+   updateUploadStatus(chapterDataRequest.getLessonsList(), chapterDataRequest.getChapterId());
     updateUploadDate(courseId);
 }
-    public Integer getChapterId(Integer courseId, String chapterName)
+    public List<Chapter> getChaptersList(Integer courseId)
     {
-        return  jdbcTemplate.queryForObject("SELECT chapterId FROM chapter WHERE courseId=? and chapterName=?", Integer.class, courseId, chapterName);
+        return  jdbcTemplate.query("SELECT * FROM chapter WHERE courseId=?", new BeanPropertyRowMapper<>(Chapter.class), courseId);
     }
 
-    public Integer getLessonId(Integer chapterId, String lessonName)
+    public List<Lesson> getLessonsList(Integer chapterId)
     {
-        return jdbcTemplate.queryForObject("SELECT lessonId FROM lesson WHERE chapterId=? and lessonName=?",Integer.class,chapterId, lessonName);
+        return jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId=? ",new BeanPropertyRowMapper<>(Lesson.class),chapterId);
     }
     public Integer getCourseId(Integer courseId)
     {
@@ -217,88 +224,215 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
         }
     }
 
-    public Integer getLastLessonNumber(List<LessonDataRequest> lessonDataRequests,Integer chapterId)
+    public Integer getLastLessonNumber(Integer courseId, Integer chapterId)
     {
         Integer lessonNumber =0;
-       for(LessonDataRequest lessonDataRequest : lessonDataRequests)
+       List<Chapter> chapterList = jdbcTemplate.query("SELECT * FROM chapter WHERE courseId = ?", new BeanPropertyRowMapper<>(Chapter.class), courseId);
+       for(Chapter chapter : chapterList)
        {
-           if(lessonDataRequest.getLessonId() != null)
-           {
-               lessonNumber  = jdbcTemplate.queryForObject("SELECT lessonNumber FROM lesson WHERE lessonId = ?", Integer.class, lessonDataRequest.getLessonId());
+           List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId = ?", new BeanPropertyRowMapper<>(Lesson.class), chapter.getChapterId());
+           for(Lesson lesson:lessons) {
+               if (lesson.getLessonId() != null) {
+                   lessonNumber = jdbcTemplate.queryForObject("SELECT lessonNumber FROM lesson WHERE lessonId = ?", Integer.class, lesson.getLessonId());
+               }
            }
        }
-        System.out.println("last lesson number "+lessonNumber);
+
        return lessonNumber;
     }
 
-    public void enrollmentUpdate(String adminId, Integer courseId, Integer chapterId, Integer lessonId)
+    public List<String> getEnrolledUsers(Integer courseId)
     {
 
-        List<Enrollment> enrollments = jdbcTemplate.queryForList("SELECT * FROM enrollment WHERE courseId = ?",Enrollment.class,chapterId);
+        List<String> enrolledUsers = jdbcTemplate.queryForList("SELECT userName FROM enrollment WHERE courseId = ?",  String.class,courseId);
 
-        if(enrollments.size() > 0)
+        return  enrolledUsers;
+    }
+    public void chapterEnrollmentUpdate(Integer courseId, Integer chapterId)
+    {
+         List<String> usernames = getEnrolledUsers(courseId);
+         for(String username:usernames)
+         {
+             jdbcTemplate.update("INSERT INTO chapterProgress(userName,courseId,chapterId) values(?,?,?)",username,courseId,chapterId);
+         }
+    }
+    public void
+
+    updateLessonStatus(Integer courseId, Integer chapterId, Integer lessonId)
+    {
+        List<String> enrolledUsers = getEnrolledUsers(courseId);
+        boolean previousLessonCompleted = false;
+        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId = ?", new BeanPropertyRowMapper<>(Lesson.class), chapterId);
+        for(int i=0;i<lessons.size();i++)
         {
-        for(Enrollment enrollment: enrollments)
-        {
-            jdbcTemplate.update("INSERT INTO courseProgress(userName, courseId) values(?,?)",enrollment.getUserName(),courseId);
-            List<Integer> chapterIds = jdbcTemplate.queryForList("SELECT chapterId FROM chapter WHERE courseId = ?",Integer.class,courseId);
-            for(Integer chapterIdData :chapterIds)
+            for(String user: enrolledUsers)
             {
-                jdbcTemplate.update("INSERT INTO chapterProgress(userName,courseId,chapterId) values(?,?,?)",enrollment.getUserName(),courseId,chapterIdData);
-                List<Integer> lessonIds = jdbcTemplate.queryForList("SELECT lessonId FROM lesson WHERE chapterId = ?", Integer.class, chapterId);
-                for(Integer lessonIdData : lessonIds)
+                if(lessons.get(i).getLessonId() == lessonId)
                 {
-                    jdbcTemplate.update("INSERT INTO lessonProgress(userName,chapterId,lessonId) values(?,?,?)",enrollment.getUserName(),chapterIdData,lessonIdData);
-                }
+                    previousLessonCompleted = jdbcTemplate.queryForObject("SELECT lessonCompletedStatus FROM lessonProgress WHERE lessonId = ? and userName = ?",new BeanPropertyRowMapper<>(Boolean.class),lessons.get(i-1).getLessonId(),user);
+                    if (previousLessonCompleted == true)
+                    {
+                        jdbcTemplate.update("UPDATE lessonProgress SET lessonStatus = true WHERE lessonId = ? and userName = ?", lessonId, user);
+                        jdbcTemplate.update("UPDATE chapterProgress SET chapterCompletedStatus = false WHERE chapterId = ? and userName = ?", chapterId,user);
 
-                jdbcTemplate.update("UPDATE lessonStatus = true WHERE lessonId = ?",lessonIds.get(0));
+                    }
+                }
             }
-        }
+
         }
     }
-    public void includeLesson(Integer courseId, ChapterDataRequest chapterDataRequest, String adminId, Integer chapterId) throws ParseException {
+
+    public void updateLessonNumbers(Integer courseId, Integer chapterId)
+    {
+        Integer lastLessonNumber = getLastLessonNumberOfChapter(chapterId);
+        List<Chapter> chapterList = getChaptersList(courseId);
+        for(Chapter chapter : chapterList)
+        {
+            if(chapter.getChapterId() > chapterId)
+            {
+                List<Lesson> lessons = getLessonsList(chapter.getChapterId());
+                for(Lesson lesson : lessons)
+                {
+
+                    jdbcTemplate.update("UPDATE lesson SET lessonNumber = ? WHERE lessonId = ? and  chapterId = ?",++lastLessonNumber,lesson.getLessonId(),chapter.getChapterId());
+                }
+            }
+        }
+    }
+
+    public void lessonEnrollmentUpdate(Integer courseId, Integer chapterId,Integer lessonId)
+    {
+
+        List<String> usernames = getEnrolledUsers(courseId);
+
+        for(String username:usernames)
+        {
+
+            jdbcTemplate.update("INSERT INTO lessonProgress(userName,chapterId,lessonId) values(?,?,?)",username,chapterId,lessonId);
+        }
+
+        updateLessonStatus(courseId,chapterId,lessonId);
+    }
+//    public void enrollmentUpdate(Integer courseId)
+//    {
+//
+//        List<Enrollment> enrollments = jdbcTemplate.query("SELECT username, courseId FROM enrollment WHERE courseId = ?",new BeanPropertyRowMapper<>(Enrollment.class),courseId);
+//
+//        ////////remove
+//        if(enrollments.size() > 0)
+//        {
+//        for(Enrollment enrollment: enrollments)
+//        {
+//
+//            jdbcTemplate.update("INSERT INTO courseProgress(userName, courseId) values(?,?)",enrollment.getUserName(),courseId);
+//            List<Chapter> chapterIds = jdbcTemplate.query("SELECT * FROM chapter WHERE courseId = ?",new BeanPropertyRowMapper<>(Chapter.class),courseId);
+//            for(Chapter chapterIdData :chapterIds)
+//            {
+//
+//                jdbcTemplate.update("INSERT INTO chapterProgress(userName,courseId,chapterId) values(?,?,?)",enrollment.getUserName(),courseId,chapterIdData.getChapterId());
+//                List<Lesson> lessonIds = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId = ?",new BeanPropertyRowMapper<>(Lesson.class),chapterIdData.getChapterId());
+//                for(Lesson lessonIdData : lessonIds)
+//                {
+//
+//                    jdbcTemplate.update("INSERT INTO lessonProgress(userName,chapterId,lessonId) values(?,?,?)",enrollment.getUserName(),chapterIdData.getChapterId(),lessonIdData.getLessonId());
+//                }
+//                jdbcTemplate.update("UPDATE lessonProgress set lessonStatus = true WHERE lessonId = ? and userName = ?",lessonIds.get(0).getLessonId(),enrollment.getUserName());
+//
+//            }
+//        }
+//        }
+//    }
+
+ public void isCourseCompleted(Integer courseId,Integer chapterId, Integer lessonId)
+ {
+     List<String> users = getEnrolledUsers(courseId);
+     for(String user : users)
+     {
+         boolean chaptercompletedStatus = jdbcTemplate.queryForObject("SELECT chapterCompletedStatus FROM chapterProgress WHERE chapterId = ? and username = ?", Boolean.class,chapterId, user);
+         if(chaptercompletedStatus == true)
+         {
+             jdbcTemplate.update("UPDATE lessonProgress SET lessonStatus = true WHERE lessonId = ? and userName = ?", lessonId, user);
+         }
+         jdbcTemplate.update("UPDATE chapterProgress SET chapterCompletedStatus = false, chapterStatus = true WHERE chapterId = ? and userName = ?", chapterId, user);
+//         String completedDate = jdbcTemplate.queryForObject("SELECT completedDate FROM enrollment WHERE courseId = ? and userName = ?", new BeanPropertyRowMapper<>(String.class),courseId, user);
+//         if(!(completedDate.equals("0000-00-00")))
+//         {
+//
+//             jdbcTemplate.update("UPDATE lessonProgress SET lessonStatus= true WHERE userName = ? and lessonId = ? ", user,lessonId);
+//         }
+     }
+ }
+ public Integer includeChapterWithVideoLink(Integer courseId,Integer chapterId,Integer finalLessonNumber, String lessonDuration,String lessonName, String videoLink) throws ParseException {
+     String query = "INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration,videoLink) values(?,?,?,?,?)";
+     KeyHolder keyHolder = new GeneratedKeyHolder();
+     jdbcTemplate.update(connection -> {
+         PreparedStatement ps = connection
+                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+         ps.setInt(1, finalLessonNumber);
+         ps.setInt(2, chapterId);
+         ps.setString(3, lessonName);
+         ps.setString(4, lessonDuration);
+         ps.setString(5, videoLink);
+         return ps;
+     }, keyHolder);
+
+     Integer lessonId = Integer.parseInt(keyHolder.getKey().toString());
+     //  ++lessonNumber;
+     updateChapterDuration(chapterId, lessonDuration);
+
+     lessonEnrollmentUpdate(courseId,chapterId,lessonId);
+     isCourseCompleted(courseId,chapterId,lessonId);
+     return  lessonId;
+ }
+    public Integer includeChapterWithOutVideoLink(Integer courseId,Integer chapterId,Integer finalLessonNumber, String lessonDuration,String lessonName) throws ParseException {
+        String query = "INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration) values(?,?,?,?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, finalLessonNumber);
+            ps.setInt(2, chapterId);
+            ps.setString(3, lessonName);
+            ps.setString(4, lessonDuration);
+            return ps;
+        }, keyHolder);
+
+        Integer lessonId = Integer.parseInt(keyHolder.getKey().toString());
+        //  ++lessonNumber;
+        updateChapterDuration(chapterId, lessonDuration);
+
+        lessonEnrollmentUpdate(courseId,chapterId,lessonId);
+        isCourseCompleted(courseId,chapterId,lessonId);
+        return lessonId;
+    }
+    public void includeLesson(Integer courseId, ChapterDataRequest chapterDataRequest, Integer chapterId) throws ParseException {
 
         List<LessonDataRequest> lessonsList = chapterDataRequest.getLessonsList();
-        Integer lessonNumber = getLastLessonNumber(chapterDataRequest.getLessonsList(),chapterId);
-        System.out.println("lesson number is :::::"+lessonNumber);
-
         for(LessonDataRequest lesson: lessonsList)
         {
+            Integer lessonNumber = getLastLessonNumber(courseId,chapterId);
             if(lesson.getLessonId() == null)
             {
                 String lessonName = lesson.getLessonName();
                 String lessonDuration = lesson.getLessonDuration();
                 String videoLink = lesson.getVideoLink();
                 Integer finalLessonNumber = lessonNumber+1;
-                String query = "INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration,videoLink) values(?,?,?,?,?)";
-                KeyHolder keyHolder = new GeneratedKeyHolder();
-                String chapterName = chapterDataRequest.getChapterName();
+                if(videoLink != null) {
+                    includeChapterWithVideoLink(courseId,chapterId,finalLessonNumber,lessonDuration,lessonName,videoLink);
+                }
+                else {
 
-                jdbcTemplate.update(connection -> {
-                    PreparedStatement ps = connection
-                            .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                    ps.setInt(1, finalLessonNumber);
-                    ps.setInt(2,chapterId);
-                    ps.setString(3,lessonName);
-                    ps.setString(4,lessonDuration);
-                    ps.setString(5,videoLink);
-                    return ps;
-                }, keyHolder);
-                Integer lessonId = Integer.parseInt(keyHolder.getKey().toString());
-                ++lessonNumber;
-
-                updateChapterDuration(chapterId,lesson.getLessonDuration());
-                enrollmentUpdate(adminId,courseId, chapterId,lessonId);
+                    includeChapterWithOutVideoLink(courseId,chapterId,finalLessonNumber,lessonDuration,lessonName);
+                }
             }
         }
-
     }
     public void includeChapter(ChapterDataRequest chapterDataRequest,Integer courseId,Integer chapterNumber, String adminId) throws ParseException {
-        System.out.println("inside include chapter "+chapterDataRequest);
+
         String query ="INSERT INTO chapter(courseId,chapterNumber,chapterName) values(?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String chapterName = chapterDataRequest.getChapterName();
-        System.out.println("course Id "+courseId);
+
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
                     .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -308,14 +442,16 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             return ps;
         }, keyHolder);
         Integer chapterId = Integer.parseInt(keyHolder.getKey().toString());
-        includeLesson(courseId,chapterDataRequest,adminId,chapterId);
-        updateUploadStatus(chapterId);
+        includeLesson(courseId,chapterDataRequest,chapterId);
+        chapterEnrollmentUpdate(courseId,chapterId);
+       updateUploadStatus(chapterDataRequest.getLessonsList(), chapterId);
         updateUploadDate(courseId);
     }
 
 
     public Integer getLastChapterNumber(List<ChapterDataRequest> chapterDataRequestList)
     {
+
         Integer chapterNumber =0;
         for(ChapterDataRequest chapterDataRequest: chapterDataRequestList)
         {
@@ -371,7 +507,7 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             finalDuration = timeFormat.format(new Date(durationsSum));
             courseDurationInfo = finalDuration;
         }
-        System.out.println(finalDuration);
+
         jdbcTemplate.update("UPDATE course SET courseDuration = ? WHERE courseId = ?", finalDuration,courseId);
     }
     public void addLesson(ChapterDataRequest chapterDataRequest, Integer chapterId) throws ParseException {
@@ -387,7 +523,7 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             }
             jdbcTemplate.update("INSERT INTO lesson(lessonNumber,chapterId,lessonName,lessonDuration,videoLink) values(?,?,?,?,?)",lessonNumber,chapterId,lesson.getLessonName(), lesson.getLessonDuration(), lesson.getVideoLink());
             ++lessonNumber;
-            System.out.println("Lesson number "+lessonNumber);
+
             updateChapterDuration(chapterId,lesson.getLessonDuration());
         }
         if(uploadStatus == true)
@@ -395,7 +531,41 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             jdbcTemplate.update("UPDATE chapter SET uploadStatus= true WHERE chapterId = ?", chapterId);
         }
     }
-    public void updateLesson(ChapterDataRequest chapterDataRequest, Integer chapterId) throws ParseException {
+
+    public Integer getMiddleChapterLastLessonNumber(Integer chapterId)
+    {
+        Integer lastLessonNumber =0;
+        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId = ?", new BeanPropertyRowMapper<>(Lesson.class),chapterId);
+        for(Lesson lesson: lessons)
+        {
+            lastLessonNumber = lesson.getLessonNumber();
+        }
+        return lastLessonNumber;
+    }
+
+    public Integer getLastLessonNumberOfChapter(Integer chapterId)
+    {
+        Integer lessonNumber =0;
+        List<Lesson> lessons = jdbcTemplate.query("SELECT * FROM lesson WHERE chapterId =?", new BeanPropertyRowMapper<>(Lesson.class), chapterId);
+        for(Lesson lesson : lessons)
+        {
+            lessonNumber = jdbcTemplate.queryForObject("SELECT lessonNumber FROM lesson WHERE chapterId = ? and lessonId = ?",Integer.class, chapterId, lesson.getLessonId());
+        }
+        return lessonNumber;
+    }
+    public Integer addLessonToExistingChapter(LessonDataRequest lesson, Integer chapterId, Integer courseId) throws ParseException {
+        Integer lessonNumber = getLastLessonNumberOfChapter(chapterId);
+        Integer lessonId = 0;
+        if(lesson.getVideoLink() == null)
+        {
+            lessonId= includeChapterWithOutVideoLink(courseId,chapterId,++lessonNumber,lesson.getLessonDuration(), lesson.getLessonName());
+        }
+        else {
+            lessonId= includeChapterWithVideoLink(courseId,chapterId,++lessonNumber,lesson.getLessonDuration(), lesson.getLessonName(),lesson.getVideoLink());
+        }
+        return lessonId;
+    }
+    public void updateLesson(ChapterDataRequest chapterDataRequest, Integer chapterId, Integer courseId) throws ParseException {
         boolean uploadStatus = true;
         List<LessonDataRequest> lessonsList = chapterDataRequest.getLessonsList();
         for(LessonDataRequest lesson: lessonsList)
@@ -404,9 +574,15 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
             {
                 uploadStatus = false;
             }
-            jdbcTemplate.update("UPDATE lesson SET lessonName=?,lessonDuration=?,videoLink=? WHERE chapterId = ? and lessonId = ? ",lesson.getLessonName(), lesson.getLessonDuration(), lesson.getVideoLink(), chapterDataRequest.getChapterId(),lesson.getLessonId());
-            reduceChapterDuration(chapterId, lesson.getLessonDuration());
-            updateChapterDuration(chapterId,lesson.getLessonDuration());
+            if(lesson.getLessonId() != null) {
+                jdbcTemplate.update("UPDATE lesson SET lessonName=?,lessonDuration=?,videoLink=? WHERE chapterId = ? and lessonId = ? ", lesson.getLessonName(), lesson.getLessonDuration(), lesson.getVideoLink(), chapterDataRequest.getChapterId(), lesson.getLessonId());
+                reduceChapterDuration(chapterId, lesson.getLessonDuration());
+                updateChapterDuration(chapterId, lesson.getLessonDuration());
+            }
+            else {
+                Integer lessonId = addLessonToExistingChapter(lesson,chapterId,courseId);
+                updateLessonNumbers(courseId,chapterId);
+            }
         }
         if(uploadStatus == true)
         {
@@ -429,11 +605,22 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
                      status = false;
              }
         }
+        Integer size = chapterList.size()-1;
+        System.out.println(size);
+        try
+        {
+            Integer test = jdbcTemplate.queryForObject("SELECT testId FROM test WHERE chapterId = ?", Integer.class, chapterList.get(size).getChapterId());
+        }
+       catch (Exception e)
+       {
+            return "Publishing to web failed.... Final test is missing";
+        }
         if(status == true)
         {
             jdbcTemplate.update("UPDATE course SET publishstatus = true WHERE courseId = ?",courseId);
             return "Course Published";
         }
+        System.out.println(status);
         return "Fail To Publish, Check the course and publish";
     }
 
