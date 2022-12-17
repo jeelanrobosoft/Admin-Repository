@@ -12,10 +12,16 @@ public class AdminProfileDataAccess {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+<<<<<<< HEAD
     public Profile getProfile(String adminId) {
 
         return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto FROM admin WHERE emailId=?", new BeanPropertyRowMapper<>(Profile.class), adminId);
 
+=======
+    public Profile getProfile(String adminId)
+    {
+         return jdbcTemplate.queryForObject("SELECT fullName,emailId,mobileNumber,profilePhoto FROM admin WHERE emailId=?",new BeanPropertyRowMapper<>(Profile.class),adminId);
+>>>>>>> 29b6d286b569b4e3c70739ddcdc226d4eadf6e62
 
     }
 
