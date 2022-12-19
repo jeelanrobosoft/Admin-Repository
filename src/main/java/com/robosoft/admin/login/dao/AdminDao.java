@@ -45,7 +45,7 @@ public class AdminDao {
 
     public List<StudentList> getStudentList(String emailId, long pageNumber, long pageLimit) {
         List<StudentList> studentLists = new ArrayList<>();
-        List<Enrollment> enrollments = jdbcTemplate.query("SELECT * from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? limit ?,?", new BeanPropertyRowMapper<>(Enrollment.class), emailId, pageNumber, pageLimit);
+        List<Enrollment> enrollments = jdbcTemplate.query("SELECT userName,enrollment.courseId,deleteStatus,subscribeStatus from enrollment INNER JOIN course ON course.courseId = enrollment.courseId AND course.adminId = ? AND ((subscribeStatus = true AND deleteStatus = true) OR deleteStatus = false) limit ?,? ", new BeanPropertyRowMapper<>(Enrollment.class),emailId,pageNumber,pageLimit);
         for (Enrollment enrollment : enrollments) {
             StudentList studentList = new StudentList();
             try {
@@ -137,7 +137,7 @@ public class AdminDao {
     }
 
     public Integer getTotalStudentsEnrolled(String userName) {
-        return jdbcTemplate.queryForObject("select count(enrollment.courseId) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class, userName);
+        return jdbcTemplate.queryForObject("select count(enrollment.courseId) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and ((subscribeStatus = true AND deleteStatus = true) OR deleteStatus = false) ", Integer.class, userName);
     }
 
     public Integer getTotalCoursesAdded(String userName) {
@@ -145,7 +145,7 @@ public class AdminDao {
     }
 
     public Integer getOverallResult(String userName) {
-        return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class, userName);
+        return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and ((subscribeStatus = true AND deleteStatus = true) OR deleteStatus = false)", Integer.class, userName);
     }
 
     public TestRequest getTestDetails(Integer chapterId) {
