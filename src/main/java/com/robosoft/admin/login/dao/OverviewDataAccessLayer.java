@@ -624,5 +624,9 @@ public void updateChapter(ChapterDataRequest chapterDataRequest,Integer courseId
         return "Fail To Publish, Check the course and publish";
     }
 
-
+     public String deleteCourse(Integer courseId)
+     {
+         jdbcTemplate.update("UPDATE course SET publishStatus = false and publishStatus = false WHERE courseId = ?", courseId);
+         return "Deleted SuccessFully";
+     }
 }

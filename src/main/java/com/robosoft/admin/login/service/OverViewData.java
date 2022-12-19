@@ -36,13 +36,13 @@ public class OverViewData {
             String courseId =overviewDataAccessLayer.addCourse(addCourseRequest,adminId);
              CourseIdentifier = Integer.parseInt(courseId);
             overviewDataAccessLayer. addOverView(addCourseRequest,Integer.parseInt(courseId));
-            return "Overview added";
+            return "Overview added courseId "+CourseIdentifier;
         }
        else
        {
          overviewDataAccessLayer.updateCourse(addCourseRequest);
          overviewDataAccessLayer.updateOverView(addCourseRequest);
-         return "Overview updated";
+         return "Overview updated "+courseIdData;
        }
     }
    public String addChapter(AddChapterRequest addCourseRequest) throws ParseException {
@@ -60,7 +60,7 @@ public class OverViewData {
 
            }
            overviewDataAccessLayer.updateCourseDuration(CourseIdentifier);
-           return "Chapter Data Added";
+           return "Chapter Data Added CourseId "+CourseIdentifier;
        }
        else
        {
@@ -81,7 +81,7 @@ public class OverViewData {
                }
            }
            overviewDataAccessLayer.updateCourseDuration(courseId);
-           return "Chapter Data Updated";
+           return "Chapter Data Updated "+courseId;
        }
    }
 
@@ -95,5 +95,11 @@ public class OverViewData {
            //Integer courseId = overviewDataAccessLayer.getCourseId(courseIdentifier);
            return overviewDataAccessLayer.publish(courseIdentifier);
        }
+   }
+
+   public String deleteCourse(Integer courseId)
+   {
+       String response = overviewDataAccessLayer.deleteCourse(courseId);
+       return response;
    }
 }
