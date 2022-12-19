@@ -145,7 +145,7 @@ public class AdminDao {
     }
 
     public Integer getOverallResult(String userName) {
-        return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and deleteStatus=false", Integer.class, userName);
+        return jdbcTemplate.queryForObject("select avg(courseScore) from course inner join enrollment on course.courseId=enrollment.courseId where adminId=? and ((subscribeStatus = true AND deleteStatus = true) OR deleteStatus = false)", Integer.class, userName);
     }
 
     public TestRequest getTestDetails(Integer chapterId) {
