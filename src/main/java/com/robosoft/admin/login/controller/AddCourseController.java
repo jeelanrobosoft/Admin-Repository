@@ -112,5 +112,11 @@ public class AddCourseController {
         //return new ResponseEntity<>(Collections.singletonMap("message", "Failed To Publish"), HttpStatus.NOT_MODIFIED);
     }
 
+    @PutMapping("/deleteCourse")
+    public ResponseEntity<?> deleteCourse(@RequestParam Integer courseId)
+    {
+        String response = overViewData.deleteCourse(courseId);
+        return new ResponseEntity<>(Collections.singletonMap("message", response), HttpStatus.OK);
+    }
 }
 

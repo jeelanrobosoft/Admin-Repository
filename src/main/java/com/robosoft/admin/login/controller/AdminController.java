@@ -126,6 +126,7 @@ public class AdminController {
         return new ResponseEntity<>(courseDetails,HttpStatus.OK);
     }
 
+
     @GetMapping("/course/completed")
     public ResponseEntity<?> getCourseCompletedStudents(){
         List<CertificateDetails> certificateDetails = adminService.getCourseCompletedDetails();
