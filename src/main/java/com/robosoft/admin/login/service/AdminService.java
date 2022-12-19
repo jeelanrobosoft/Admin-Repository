@@ -5,6 +5,7 @@ import com.robosoft.admin.login.dto.*;
 import com.robosoft.admin.login.model.ChangePassword;
 import com.robosoft.admin.login.model.CourseId;
 import com.robosoft.admin.login.model.Lesson;
+import com.robosoft.admin.login.model.SaveCertificate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.robosoft.admin.login.config.CloudinaryConfig.uploadProfilePhoto;
 
 @Service
 public class AdminService {
@@ -255,7 +258,6 @@ public class AdminService {
                     String studentUserName = student.getUserName();
                     String certificateNumber = " Certificate Number: CER57RF9" + studentUserName + "S978" + student.getCourseId();
                     student.setCertificateNo(certificateNumber);
-                    student.setUserName(null);
                     return student;
                 }
         ).collect(Collectors.toList());
@@ -264,9 +266,42 @@ public class AdminService {
 
     }
 
-//    public String saveCertificate(String certificateUrl) {
-//        adminDao.saveCertificate(certificateUrl);
-//    }
+    public String saveCertificate(SaveCertificate certificate) {
+        String certificateUrl;
+        boolean status = false;
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<CourseId> courseIdList = adminDao.getCourseIds(userName);
+        try{
+        for (CourseId courseId: courseIdList) {
+            if (courseId.getCourseId() == certificate.getCourseId() && certificate.getUserName().equalsIgnoreCase(courseId.getUserName()))
+            {
+                status = true;
+            }
+        }
+        } catch (Exception e)
+        {
+            return "Invalid courseId";
+        }
+        if(certificate.getCertificate() == null)
+            return "Certificate cannot be Empty";
+        if(certificate.getCertificate().isEmpty())
+            return "Certificate cannot be Empty";
+        if(certificate.getUserName() == null)
+            return "userName cannot be empty";
+        if(certificate.getUserName().isEmpty())
+            return "userName cannot be empty";
+        if(status == true){
+            certificateUrl = uploadProfilePhoto(certificate.getCertificate());
+            try{
+            adminDao.saveCertificate(certificate,certificateUrl);
+            return null;
+            } catch (Exception e){
+                return "Cannot add same data again";
+            }
+        }
+        else
+            return "Invalid courseId or userName";
+    }
 }
 
 

@@ -134,10 +134,11 @@ public class AdminController {
         return new ResponseEntity<>(certificateDetails,HttpStatus.OK);
     }
 
-//    @PostMapping("/course/certificate/save")
-//    public ResponseEntity<?> saveCertificateDetails(@RequestBody SaveCertificate certificate){
-//        String status = adminService.saveCertificate(certificate.getCertificateUrl());
-//
-//    }
+    @PostMapping("/course/certificate/save")
+    public ResponseEntity<?> saveCertificateDetails(@ModelAttribute SaveCertificate certificate){
+        String status = adminService.saveCertificate(certificate);
+        return ResponseEntity.ok().body(status);
+
+    }
 
 }

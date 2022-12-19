@@ -1,10 +1,8 @@
 package com.robosoft.admin.login.dao;
 
 import com.robosoft.admin.login.dto.*;
-import com.robosoft.admin.login.model.CourseId;
-import com.robosoft.admin.login.model.Enrollment;
-import com.robosoft.admin.login.model.Lesson;
-import com.robosoft.admin.login.model.Register;
+import com.robosoft.admin.login.dto.CourseKeywords;
+import com.robosoft.admin.login.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -229,7 +227,12 @@ public class AdminDao {
 
     }
 
-//    public void saveCertificate(String certificateUrl) {
-//        String query = ""
-//    }
+    public void saveCertificate(SaveCertificate certificate,String certificateUrl) {
+        String query = "insert into dummyCertificate values(?,?,?)";
+        jdbcTemplate.update(query,certificate.getUserName(),certificate.getCourseId(),certificateUrl);
+    }
+
+    public List<CourseId> getCourseIds(String userName) {
+        return jdbcTemplate.query("select course.courseId,userName from course inner join enrollment on course.courseId=enrollment.courseId where adminId=?",new BeanPropertyRowMapper<>(CourseId.class),userName);
+    }
 }
