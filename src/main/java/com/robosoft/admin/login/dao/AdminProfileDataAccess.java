@@ -1,6 +1,5 @@
 package com.robosoft.admin.login.dao;
 
-import com.robosoft.admin.login.model.Admin;
 import com.robosoft.admin.login.model.Profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 public class AdminProfileDataAccess {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
 
     public Profile getProfile(String adminId)
     {
